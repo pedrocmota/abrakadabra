@@ -1,0 +1,55 @@
+{
+  "name": "abrakadabra",
+  "version": "1.0.1",
+  "author": {
+    "name": "Pedro Mota"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pedrocmota/abrakadabra"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "initDatabase": ""
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^1.8.6",
+    "@emotion/react": "^11.8.2",
+    "@emotion/styled": "^11.8.1",
+    "axios": "^0.26.1",
+    "bcrypt": "^5.0.1",
+    "bootstrap": "^5.1.3",
+    "cookies": "^0.8.0",
+    "dayjs": "^1.11.0",
+    "framer-motion": "^6.2.8",
+    "imask": "^6.4.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.4.1",
+    "next": "12.1.0",
+    "randomstring": "^1.2.2",
+    "react": "17.0.2",
+    "react-bootstrap": "^2.2.1",
+    "react-dom": "17.0.2",
+    "react-toast-notifications": "^2.5.1",
+    "sweetalert2": "^11.4.7",
+    "sweetalert2-react-content": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/cookies": "^0.7.7",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/mongodb": "^4.0.7",
+    "@types/node": "^17.0.23",
+    "@types/randomstring": "^1.1.8",
+    "@types/react": "17.0.41",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "8.11.0",
+    "eslint-config-next": "12.1.0",
+    "eslint-plugin-react": "^7.29.4",
+    "typescript": "4.6.2"
+  }
+}
