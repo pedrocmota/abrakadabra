@@ -20,7 +20,10 @@ export default async (req: ExtendedNextApiRequest<ISyncRequest>, res: NextApiRes
         token: req.query.token
       })
       if (machine) {
-        const pins = (await usersSchema.find({}).project({_id: 0, pin: 1}).toArray()).map((e) => e.pin)
+        const pins = (await usersSchema.find({}).project({_id: 0, pin: 1})
+          .toArray())
+          .filter((e) => e.pin)
+          .map((e) => e.pin)
         const cards = (await cardsSchema.find({status: 1}).project({_id: 0, uuid: 1}).toArray())
           .map((e) => e.uuid).filter((e) => e != null)
         res.json({
