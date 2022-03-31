@@ -12,6 +12,7 @@ import {
   Button,
   Input,
   Table,
+  Th,
   Thead
 } from '@chakra-ui/react'
 import dayjs from 'dayjs'
@@ -21,15 +22,11 @@ import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
 import {showChangeEmail} from '../popups/showChangeEmail'
 import {showChangePassword} from '../popups/showChangePassword'
-import {showChangePin} from '../popups/showChangePIN'
 import {requireSession} from '../utils/request'
 import {getIndexProps} from '../models/getIndexProps'
-import {ICards, IAccess} from '../models/Schemas'
+import {IProfileData, ICards, IAccess} from '../models/Schemas'
 
-interface IHome {
-  name: string,
-  fullname: string,
-  isAdmin: boolean,
+interface IHome extends IProfileData {
   cards: ICards[],
   accesses: IAccess[]
 }
@@ -94,7 +91,7 @@ const Home: NextPage<IHome> = (props) => {
             display="flex"
             flexDir="column"
             width="95%"
-            maxW="800px"
+            maxW="1000px"
             flex="1"
             marginTop="40px"
             marginBottom="40px"
@@ -194,30 +191,6 @@ const Home: NextPage<IHome> = (props) => {
                   >
                     Trocar senha
                   </Button>
-                  <Button
-                    width="160px"
-                    height="30px"
-                    marginTop="12px"
-                    backgroundColor="#009879"
-                    border="0"
-                    borderRadius="2px"
-                    color="#ffffff"
-                    marginLeft="5px"
-                    sx={{
-                      '@media screen and (max-width: 614px)': {
-                        height: '38px'
-                      }
-                    }}
-                    onClick={showChangePin}
-                    _disabled={{
-                      backgroundColor: '#9B9191'
-                    }}
-                    _hover={{
-                      backgroundColor: '#03A786'
-                    }}
-                  >
-                    Trocar PIN
-                  </Button>
                 </Flex>
               </Flex>
             </Flex>
@@ -262,6 +235,9 @@ const Home: NextPage<IHome> = (props) => {
                     '& td': {
                       padding: '16px',
                       color: '#1F1C1C'
+                    },
+                    '& tr:hover:not(#thdead)': {
+                      backgroundColor: '#E7E7E7'
                     }
                   }}
                 >
@@ -273,10 +249,10 @@ const Home: NextPage<IHome> = (props) => {
                     text-align="left"
                   >
                     <tr id="thdead">
-                      <th>Código do cartão</th>
-                      <th>Nome do cartão</th>
-                      <th>Estado</th>
-                      <th>Ação</th>
+                      <Th>Código do cartão</Th>
+                      <Th>Nome do cartão</Th>
+                      <Th>Estado</Th>
+                      <Th width="250px">Ação</Th>
                     </tr>
                   </Thead>
                   <tbody>
@@ -291,25 +267,6 @@ const Home: NextPage<IHome> = (props) => {
                             {card.status === 2 && 'Desativado'}
                           </td>
                           <td>
-                            {(card.status === 0) && (
-                              <Button
-                                width="100%"
-                                height="30px"
-                                backgroundColor="#ffc107"
-                                border="0"
-                                borderRadius="2px"
-                                color="#ffffff"
-                                padding="10px"
-                                _disabled={{
-                                  backgroundColor: '#9B9191'
-                                }}
-                                _hover={{
-                                  backgroundColor: '#FFC926'
-                                }}
-                              >
-                                Adicionar UUID
-                              </Button>
-                            )}
                             {(card.status === 1) && (
                               <Button
                                 width="100%"
@@ -409,6 +366,9 @@ const Home: NextPage<IHome> = (props) => {
                     '& td': {
                       padding: '16px',
                       color: '#1F1C1C'
+                    },
+                    '& tr:hover:not(#thdead)': {
+                      backgroundColor: '#E7E7E7'
                     }
                   }}
                 >
@@ -424,7 +384,6 @@ const Home: NextPage<IHome> = (props) => {
                       <th>Data/Horário</th>
                       <th>Pessoa</th>
                       <th>Lugar</th>
-                      <th>Chave</th>
                     </tr>
                   </Thead>
                   <tbody>
@@ -434,7 +393,6 @@ const Home: NextPage<IHome> = (props) => {
                           <td>{dayjs.unix(access.datetime).format('DD/MM/YYYY HH:mm:ss')}</td>
                           <td>{access.user}</td>
                           <td>{access.place}</td>
-                          <td>{access.keyType}</td>
                         </tr>
                       )
                     }))}

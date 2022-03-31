@@ -26,7 +26,7 @@ const AddUser: React.FunctionComponent = () => {
 
   const [loading, setLoading] = useState(false)
   const validButton = (() => {
-    if (name.length < 3 || name.length > 30 && loading) {
+    if ((name.length < 3 || name.length > 30) || loading) {
       return false
     }
     if (!validateEmail(email) || userType.length < 1) {

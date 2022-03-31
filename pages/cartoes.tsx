@@ -10,6 +10,7 @@ import {
   Input,
   Select,
   Table,
+  Th,
   Thead,
   Button,
   Text
@@ -21,12 +22,9 @@ import {filter} from '../utils/filter'
 import {showAddCard} from '../popups/showAddCard'
 import {requireSession} from '../utils/request'
 import {getUserProps} from '../models/getUserProps'
-import {ICards} from '../models/Schemas'
+import {IProfileData, ICards} from '../models/Schemas'
 
-interface ICardsProps {
-  name: string,
-  fullname: string,
-  isAdmin: boolean,
+interface ICardsProps extends IProfileData {
   users: {
     _id: string,
     name: string
@@ -40,6 +38,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
   const {addToast} = useToasts()
   const table = createRef<HTMLTableElement>()
   const cards = data.filter(e => e.user === user)
+  const inReadingMode = data.some((card) => card.status === 3)
 
   useEffect(() => {
     refresh()
@@ -135,7 +134,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
             display="flex"
             flexDir="column"
             width="95%"
-            maxW="800px"
+            maxW="1000px"
             flex="1"
             marginTop="40px"
             marginBottom="40px"
@@ -231,6 +230,9 @@ const Cards: NextPage<ICardsProps> = (props) => {
                   '& td': {
                     padding: '16px',
                     color: '#1F1C1C'
+                  },
+                  '& tr:hover:not(#thdead)': {
+                    backgroundColor: '#E7E7E7'
                   }
                 }}
               >
@@ -242,10 +244,11 @@ const Cards: NextPage<ICardsProps> = (props) => {
                   text-align="left"
                 >
                   <tr id="thdead">
-                    <th>Código do cartão</th>
-                    <th>Nome do cartão</th>
-                    <th>Estado</th>
-                    <th>Ação</th>
+                    <Th>Código do cartão</Th>
+                    <Th>Nome do cartão</Th>
+                    <Th>UUID</Th>
+                    <Th>Estado</Th>
+                    <Th width="250px">Ação</Th>
                   </tr>
                 </Thead>
                 <tbody>
@@ -254,32 +257,35 @@ const Cards: NextPage<ICardsProps> = (props) => {
                       <tr key={card._id}>
                         <td>{card.code}</td>
                         <td>{card.alias}</td>
+                        <td>{card.uuid}</td>
                         <td>
                           {card.status === 0 && 'Sem UUID'}
                           {card.status === 1 && 'Funcionando'}
                           {card.status === 2 && 'Desativado'}
+                          {card.status === 3 && 'Esperando leitura'}
                         </td>
                         <td>
                           <Flex
                             flexDir="column"
                           >
-                            {(card.status === 0) && (
+                            {(card.status === 0 && !inReadingMode) && (
                               <Button
                                 width="100%"
                                 height="30px"
-                                backgroundColor="#ffc107"
+                                backgroundColor="#3E3BFF"
                                 border="0"
                                 borderRadius="2px"
                                 color="#ffffff"
                                 padding="10px"
+                                onClick={() => changeCardStatus(card, '3')}
                                 _disabled={{
                                   backgroundColor: '#9B9191'
                                 }}
                                 _hover={{
-                                  backgroundColor: '#FFC926'
+                                  backgroundColor: '#4442ff'
                                 }}
                               >
-                                Adicionar UUID
+                                Ativar modo leitura
                               </Button>
                             )}
                             {(card.status === 1) && (
@@ -320,6 +326,26 @@ const Cards: NextPage<ICardsProps> = (props) => {
                                 }}
                               >
                                 Ativar cartão
+                              </Button>
+                            )}
+                            {(card.status === 3 && inReadingMode) && (
+                              <Button
+                                width="100%"
+                                height="30px"
+                                backgroundColor="#3E3BFF"
+                                border="0"
+                                borderRadius="2px"
+                                color="#ffffff"
+                                padding="10px"
+                                onClick={() => changeCardStatus(card, '0')}
+                                _disabled={{
+                                  backgroundColor: '#9B9191'
+                                }}
+                                _hover={{
+                                  backgroundColor: '#4442ff'
+                                }}
+                              >
+                                Desativar modo leitura
                               </Button>
                             )}
                             <Button

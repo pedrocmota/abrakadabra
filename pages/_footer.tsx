@@ -17,7 +17,7 @@ const Footer: React.FunctionComponent = () => {
         fontSize="20px"
         marginBottom="15px"
       >
-        Abrakadabra v1.0
+        Abrakadabra v1.0.2
       </Text>
       <Text
         color="#ffffff"

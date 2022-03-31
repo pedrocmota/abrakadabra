@@ -12,7 +12,6 @@ export const getUserProps = async (userID: string) => {
       delete doc.email
       //@ts-ignore
       delete doc.password
-      delete doc.pin
       return ({
         ...doc,
         _id: doc._id.toString()

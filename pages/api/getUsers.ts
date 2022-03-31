@@ -13,7 +13,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         delete doc.email
         //@ts-ignore
         delete doc.password
-        delete doc.pin
         return ({
           ...doc,
           _id: doc._id.toString()

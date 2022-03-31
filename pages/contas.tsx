@@ -10,6 +10,7 @@ import {
   Input,
   Button,
   Table,
+  Th,
   Text,
   Thead
 } from '@chakra-ui/react'
@@ -20,12 +21,10 @@ import {filter} from '../utils/filter'
 import {showAddUser} from '../popups/showAddUser'
 import {requireSession} from '../utils/request'
 import {getUserProps} from '../models/getUserProps'
-import {IUsers} from '../models/Schemas'
+import {IProfileData, IUsers} from '../models/Schemas'
 
-interface IAccountsProps {
+interface IAccountsProps extends IProfileData {
   userID: string,
-  name: string,
-  fullname: string,
   isAdmin: boolean,
   users: IUsers[]
 }
@@ -91,7 +90,7 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
             display="flex"
             flexDir="column"
             width="95%"
-            maxW="800px"
+            maxW="1000px"
             flex="1"
             marginTop="40px"
             marginBottom="40px"
@@ -164,6 +163,9 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
                   '& td': {
                     padding: '16px',
                     color: '#1F1C1C'
+                  },
+                  '& tr:hover:not(#thdead)': {
+                    backgroundColor: '#E7E7E7'
                   }
                 }}
               >
@@ -175,9 +177,9 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
                   text-align="left"
                 >
                   <tr id="thdead">
-                    <th>Nome</th>
-                    <th>Tipo de usuário</th>
-                    <th>Ação</th>
+                    <Th>Nome</Th>
+                    <Th>Tipo de usuário</Th>
+                    <Th width="220px">Ação</Th>
                   </tr>
                 </Thead>
                 <tbody>

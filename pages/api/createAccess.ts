@@ -7,9 +7,7 @@ import {MachinesSchema, UsersSchema, CardsSchema, AccessesSchema} from '../../mo
 
 interface ICreateAccessRequest {
   token: string,
-  keyType: string,
-  uuid: string,
-  pin: string
+  uuid: string
 }
 
 export default async (req: ExtendedNextApiRequest<ICreateAccessRequest>, res: NextApiResponse) => {
@@ -20,8 +18,7 @@ export default async (req: ExtendedNextApiRequest<ICreateAccessRequest>, res: Ne
         keyType: 'string'
       },
       opcionalBody: {
-        uuid: 'string',
-        pin: 'string'
+        uuid: 'string'
       }
     })) {
       const machinesSchema = await MachinesSchema()
@@ -31,59 +28,32 @@ export default async (req: ExtendedNextApiRequest<ICreateAccessRequest>, res: Ne
 
       dayjs.extend(utc)
       dayjs.extend(timezone)
-      const keyType = req.body.keyType as string
-      if (keyType === 'Cartão') {
-        const machine = await machinesSchema.findOne({
-          token: req.body.token || ''
+      const machine = await machinesSchema.findOne({
+        token: req.body.token || ''
+      })
+      if (machine) {
+        const card = await cardsSchema.findOne({
+          uuid: req.body.uuid
         })
-        if (machine) {
-          const card = await cardsSchema.findOne({
-            uuid: req.body.uuid
-          })
-          if (card) {
-            const user = await usersSchema.findOne({
-              _id: toID(card.user)
-            })
-            if (user) {
-              accessesSchema.insertOne({
-                user: user._id.toString(),
-                place: machine._id.toString(),
-                keyType: 'Cartão',
-                datetime: dayjs().tz('America/Bahia').unix()
-              })
-              return res.status(200).end()
-            } else {
-              return res.status(400).end()
-            }
-          } else {
-            return res.status(404).end()
-          }
-        } else {
-          return res.status(401).end()
-        }
-      }
-      if (keyType === 'PIN') {
-        const machine = await machinesSchema.findOne({
-          token: req.body.token
-        })
-        if (machine) {
+        if (card) {
           const user = await usersSchema.findOne({
-            pin: parseInt(req.body.pin)
+            _id: toID(card.user)
           })
           if (user) {
             accessesSchema.insertOne({
               user: user._id.toString(),
               place: machine._id.toString(),
-              keyType: 'PIN',
               datetime: dayjs().tz('America/Bahia').unix()
             })
             return res.status(200).end()
           } else {
-            return res.status(404).end()
+            return res.status(400).end()
           }
         } else {
-          return res.status(401).end()
+          return res.status(404).end()
         }
+      } else {
+        return res.status(401).end()
       }
       return res.status(400).end()
     } else {

@@ -1,6 +1,6 @@
 import type {NextApiResponse} from 'next'
 import {ExtendedNextApiRequest, requireParams} from '../../utils/request'
-import {MachinesSchema, UsersSchema, CardsSchema} from '../../models/Schemas'
+import {MachinesSchema, CardsSchema} from '../../models/Schemas'
 
 interface ISyncRequest {
   token: string
@@ -14,21 +14,19 @@ export default async (req: ExtendedNextApiRequest<ISyncRequest>, res: NextApiRes
       }
     })) {
       const machinesSchema = await MachinesSchema()
-      const usersSchema = await UsersSchema()
       const cardsSchema = await CardsSchema()
       const machine = await machinesSchema.findOne({
         token: req.query.token
       })
       if (machine) {
-        const pins = (await usersSchema.find({}).project({_id: 0, pin: 1})
+        const cards = (await cardsSchema.find()
+          .project({_id: 0, uuid: 1, status: 1})
           .toArray())
-          .filter((e) => e.pin)
-          .map((e) => e.pin)
-        const cards = (await cardsSchema.find({status: 1}).project({_id: 0, uuid: 1}).toArray())
-          .map((e) => e.uuid).filter((e) => e != null)
         res.json({
-          pins: pins,
+          inReadingMode: cards.some((card) => card.status === 3),
           cards: cards
+            .filter((card) => card !== null && card.status === 1)
+            .map((e) => e.uuid)
         })
       } else {
         return res.status(401).end()

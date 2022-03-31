@@ -1,10 +1,15 @@
 import {connectToDatabase} from '../utils/database'
 
+export interface IProfileData {
+  name: string,
+  fullname: string,
+  isAdmin: boolean
+}
+
 export interface IUsers {
   _id?: string,
   email: string,
   password: string,
-  pin?: number,
   name: string,
   admin: boolean
 }
@@ -23,7 +28,6 @@ export interface IAccess {
   datetime: number,
   user: string,
   userName?: string,
-  keyType: 'Cartão' | 'PIN',
   place: string
 }
 

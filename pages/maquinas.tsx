@@ -10,6 +10,7 @@ import {
   Input,
   Button,
   Table,
+  Th,
   Text,
   Thead
 } from '@chakra-ui/react'
@@ -20,12 +21,9 @@ import {filter} from '../utils/filter'
 import {showAddMachine} from '../popups/showAddMachine'
 import {requireSession} from '../utils/request'
 import {getMachinesProps} from '../models/getMachinesProps'
-import {IMachines} from '../models/Schemas'
+import {IProfileData, IMachines} from '../models/Schemas'
 
-interface IMachinesProps {
-  name: string,
-  fullname: string,
-  isAdmin: boolean,
+interface IMachinesProps extends IProfileData {
   machines: IMachines[]
 }
 
@@ -90,7 +88,7 @@ const Machines: NextPage<IMachinesProps> = (props) => {
             display="flex"
             flexDir="column"
             width="95%"
-            maxW="800px"
+            maxW="1000px"
             flex="1"
             marginTop="40px"
             marginBottom="40px"
@@ -163,6 +161,9 @@ const Machines: NextPage<IMachinesProps> = (props) => {
                   '& td': {
                     padding: '16px',
                     color: '#1F1C1C'
+                  },
+                  '& tr:hover:not(#thdead)': {
+                    backgroundColor: '#E7E7E7'
                   }
                 }}
               >
@@ -174,9 +175,9 @@ const Machines: NextPage<IMachinesProps> = (props) => {
                   text-align="left"
                 >
                   <tr id="thdead">
-                    <th>Código máquinas</th>
-                    <th>Nome da máquinas</th>
-                    <th>Ação</th>
+                    <Th>Código máquinas</Th>
+                    <Th>Nome da máquinas</Th>
+                    <Th width="220px">Ação</Th>
                   </tr>
                 </Thead>
                 <tbody>

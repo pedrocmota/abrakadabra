@@ -10,6 +10,7 @@ import {
   Input,
   Select,
   Table,
+  Th,
   Button,
   Text,
   Thead
@@ -21,12 +22,9 @@ import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
 import {requireSession} from '../utils/request'
 import {getUserProps} from '../models/getUserProps'
-import {IAccess} from '../models/Schemas'
+import {IProfileData, IAccess} from '../models/Schemas'
 
-interface IAccessesProps {
-  name: string,
-  fullname: string,
-  isAdmin: boolean,
+interface IAccessesProps extends IProfileData {
   users: {
     _id: string,
     name: string
@@ -108,7 +106,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
             display="flex"
             flexDir="column"
             width="95%"
-            maxW="800px"
+            maxW="1000px"
             flex="1"
             marginTop="40px"
             marginBottom="40px"
@@ -182,6 +180,9 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                   '& td': {
                     padding: '16px',
                     color: '#1F1C1C'
+                  },
+                  '& tr:hover:not(#thdead)': {
+                    backgroundColor: '#E7E7E7'
                   }
                 }}
               >
@@ -193,11 +194,10 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                   text-align="left"
                 >
                   <tr id="thdead">
-                    <th>Data/horário</th>
-                    <th>Pessoa</th>
-                    <th>Lugar</th>
-                    <th>Chave</th>
-                    <th>Ação</th>
+                    <Th>Data/horário</Th>
+                    <Th>Pessoa</Th>
+                    <Th>Lugar</Th>
+                    <Th width="220px">Ação</Th>
                   </tr>
                 </Thead>
                 <tbody>
@@ -207,7 +207,6 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                         <td>{dayjs.unix(access.datetime).format('DD/MM/YYYY HH:mm:ss')}</td>
                         <td>{access.userName}</td>
                         <td>{access.place}</td>
-                        <td>{access.keyType}</td>
                         <td>
                           <Button
                             width="100%"

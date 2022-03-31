@@ -18,7 +18,11 @@ export default async (req: ExtendedNextApiRequest<IChangeCardStatusRequest>, res
     })) {
       const session = requireSession(req.cookies.session, false)
       if (session) {
-        if (req.body.status === '1' || req.body.status === '2') {
+        if (
+          req.body.status === '0' ||
+          req.body.status === '1' ||
+          req.body.status === '2' ||
+          req.body.status === '3') {
           const usersSchema = await UsersSchema()
           const cardsSchema = await CardsSchema()
 
