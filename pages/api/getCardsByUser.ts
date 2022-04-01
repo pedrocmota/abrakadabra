@@ -19,9 +19,7 @@ export default async (req: ExtendedNextApiRequest<IGetCardsByUserRequest>, res: 
         const cardsSchema = await CardsSchema()
 
         const allUsers = await usersSchema.find().toArray()
-        const cards = (await cardsSchema.find({
-          user: req.query.userID
-        }, {
+        const cards = (await cardsSchema.find({}, {
           sort: {datetime: 1}
         }).toArray()).map(doc => {
           return ({
@@ -30,7 +28,10 @@ export default async (req: ExtendedNextApiRequest<IGetCardsByUserRequest>, res: 
             userName: allUsers.find(e => e._id.toString() === doc.user)?.name || 'Desconhecido'
           })
         })
-        return res.json(cards)
+        return res.json({
+          inReadingMode: cards.some((card) => card.status === 3),
+          cards: cards.filter((card) => card.user == req.query.userID)
+        })
       } else {
         return res.status(401).end()
       }

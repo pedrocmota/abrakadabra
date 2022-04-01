@@ -8,4 +8,8 @@ declare global {
   }
 }
 
+export interface IpublicRuntimeConfig {
+  version: string
+}
+
 export { }

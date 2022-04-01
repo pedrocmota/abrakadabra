@@ -3,16 +3,16 @@ import {ExtendedNextApiRequest, requireParams} from '../../utils/request'
 import {CardsSchema, MachinesSchema} from '../../models/Schemas'
 
 interface ISetUUIDRequest {
-  uuid: string,
-  token: string
+  token: string,
+  uuid: string
 }
 
 export default async (req: ExtendedNextApiRequest<ISetUUIDRequest>, res: NextApiResponse) => {
   if (req.method === 'POST') {
-    if (!requireParams(req, {
-      query: {
-        uuid: 'string',
-        token: 'string'
+    if (requireParams(req, {
+      body: {
+        token: 'string',
+        uuid: 'string'
       }
     })) {
       const machinesSchema = await MachinesSchema()
@@ -21,11 +21,27 @@ export default async (req: ExtendedNextApiRequest<ISetUUIDRequest>, res: NextApi
       const machine = await machinesSchema.findOne({
         token: req.body.token
       })
-      if (!machine) {
+      if (machine) {
+        const cardWithoutUUID = (await cardSchema.findOne({
+          status: 3
+        }))
+        if (cardWithoutUUID) {
+          if (req.body.uuid.length > 3 && req.body.uuid.length < 10) {
+            await cardSchema.updateOne({status: 3}, {
+              $set: {
+                status: 1, uuid: req.body.uuid
+              }
+            })
+            return res.status(200).end()
+          } else {
+            return res.status(405).end()
+          }
+        } else {
+          return res.status(404).end()
+        }
+      } else {
         return res.status(401).end()
       }
-      await cardSchema.updateOne({status: 3}, {status: 1, uuid: req.body.uuid})
-      return res.status(200).end()
     } else {
       return res.status(422).end()
     }

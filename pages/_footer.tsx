@@ -1,7 +1,10 @@
 import React from 'react'
 import {Flex, Box, Text, Link} from '@chakra-ui/react'
+import getConfig from 'next/config'
+import {IpublicRuntimeConfig} from '../utils/types/environment.d'
 
 const Footer: React.FunctionComponent = () => {
+  const publicRuntimeConfig = getConfig().publicRuntimeConfig as IpublicRuntimeConfig
   return (
     <Flex
       width="100%"
@@ -17,7 +20,7 @@ const Footer: React.FunctionComponent = () => {
         fontSize="20px"
         marginBottom="15px"
       >
-        Abrakadabra v1.0.2
+        Abrakadabra v{publicRuntimeConfig.version}
       </Text>
       <Text
         color="#ffffff"

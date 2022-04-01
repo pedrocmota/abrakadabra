@@ -34,11 +34,11 @@ interface ICardsProps extends IProfileData {
 const Cards: NextPage<ICardsProps> = (props) => {
   const [user, setUser] = useState('')
   const [data, setData] = useState<ICards[]>([])
+  const [inReadingMode, setInReadingMode] = useState(false)
   const [loading, setLoading] = useState(false)
   const {addToast} = useToasts()
   const table = createRef<HTMLTableElement>()
   const cards = data.filter(e => e.user === user)
-  const inReadingMode = data.some((card) => card.status === 3)
 
   useEffect(() => {
     refresh()
@@ -53,7 +53,8 @@ const Cards: NextPage<ICardsProps> = (props) => {
         }
       })
       setLoading(false)
-      setData(response.data)
+      setData(response.data.cards)
+      setInReadingMode(response.data.inReadingMode)
     }
   }
 
@@ -99,6 +100,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
             }
             return newCard
           }))
+          setInReadingMode(cards.some((card) => card.status === 3))
         } else {
           addToast(`Erro desconhecido. Status code ${response.status}`, {appearance: 'error'})
         }
