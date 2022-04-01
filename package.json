@@ -1,8 +1,8 @@
 {
   "name": "abrakadabra",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": {
-    "name": "Pedro Mota"
+    "name": "Pedro Mota e João Costa"
   },
   "repository": {
     "type": "git",
@@ -12,8 +12,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "initDatabase": ""
+    "lint": "next lint"
   },
   "dependencies": {
     "@chakra-ui/react": "^1.8.6",
