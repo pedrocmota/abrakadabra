@@ -32,7 +32,7 @@ export default async (req: ExtendedNextApiRequest<ISendRecoveryEmailRequest>, re
           code: code,
           expiresAt: new Date()
         })
-        sendEmail(req.body.email, code)
+        await sendEmail(req.body.email, code)
       }
       res.status(200).end()
     } else {
