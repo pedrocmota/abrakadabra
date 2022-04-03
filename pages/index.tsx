@@ -56,6 +56,7 @@ const Home: NextPage<IHome> = (props) => {
             }
             return newCard
           }))
+          addToast('Estado alterado com sucesso!', {appearance: 'success'})
         } else {
           addToast(`Erro desconhecido. Status code ${response.status}`, {appearance: 'error'})
         }
@@ -265,6 +266,7 @@ const Home: NextPage<IHome> = (props) => {
                             {card.status === 0 && 'Sem UUID'}
                             {card.status === 1 && 'Funcionando'}
                             {card.status === 2 && 'Desativado'}
+                            {card.status === 3 && 'Esperando leitura'}
                           </td>
                           <td>
                             {(card.status === 1) && (

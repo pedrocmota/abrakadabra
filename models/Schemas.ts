@@ -37,6 +37,13 @@ export interface IMachines {
   token: string
 }
 
+export interface IRecoveryCodes {
+  _id?: string,
+  userID: string,
+  code: string,
+  expiresAt: any
+}
+
 export const UsersSchema = async () => {
   const db = await connectToDatabase()
   return db.collection<IUsers>('users')
@@ -55,4 +62,9 @@ export const CardsSchema = async () => {
 export const MachinesSchema = async () => {
   const db = await connectToDatabase()
   return db.collection<IMachines>('machines')
+}
+
+export const RecoveryCodesSchema = async () => {
+  const db = await connectToDatabase()
+  return db.collection<IRecoveryCodes>('codes')
 }

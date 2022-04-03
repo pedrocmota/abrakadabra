@@ -100,6 +100,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
             }
             return newCard
           }))
+          addToast('Estado alterado com sucesso!', {appearance: 'success'})
           setInReadingMode(cards.some((card) => card.status === 3))
         } else {
           addToast(`Erro desconhecido. Status code ${response.status}`, {appearance: 'error'})

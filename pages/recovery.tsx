@@ -1,32 +1,38 @@
 import React, {useState, FormEvent} from 'react'
-import type {NextPage} from 'next'
 import Head from 'next/head'
 import Router from 'next/router'
+import {GetServerSideProps} from 'next'
 import {Flex, Text, Input, Button} from '@chakra-ui/react'
 import axios from 'axios'
 import {useToasts} from 'react-toast-notifications'
-import {GetServerSideProps} from 'next'
-import {showRecoveryPassword} from '../popups/showRecoveryPassword'
-import {requireSession} from '../utils/request'
+import {RecoveryCodesSchema} from '../models/Schemas'
 
-const Login: NextPage = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+interface IRecovery {
+  recoveryCode: string
+}
+
+const Recovery: React.FunctionComponent<IRecovery> = (props) => {
+  const [password1, setPassword1] = useState('')
+  const [password2, setPassword2] = useState('')
   const [loading, setLoading] = useState(false)
   const {addToast} = useToasts()
+  const validButton = password1.length > 6 && password1.length < 30 && password1 === password2 && !loading
 
-  const sendLogin = (event: FormEvent) => {
+  const sendRecoveryPassword = (event: FormEvent) => {
     event.preventDefault()
     setLoading(true)
-    axios.post('/api/login', {
-      email: email,
-      password: password
+    axios.post('/api/recoveryPassword', {
+      recoveryCode: props.recoveryCode,
+      password: password1
     }).then(() => {
-      Router.push('/')
+      addToast('Senha alterada com sucesso!', {
+        appearance: 'success'
+      })
+      Router.push('/login')
     }).catch((error) => {
       setLoading(false)
-      if (error.response.status === 401) {
-        return addToast('Usuário e/ou senha incorretos', {appearance: 'error'})
+      if (error.response.status === 404) {
+        return addToast('Esse código expirou', {appearance: 'error'})
       } else {
         return addToast(`Erro desconhecido. Status ${error.response.status}`, {appearance: 'error'})
       }
@@ -36,7 +42,7 @@ const Login: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Abrakadabra - Login</title>
+        <title>Abrakadabra - Recuperar conta</title>
       </Head>
       <Flex
         className="background"
@@ -79,8 +85,9 @@ const Login: NextPage = () => {
               fontSize="32px"
               fontFamily="Sans-serif"
               color="#F3F3F3"
+              textAlign="center"
             >
-              Abrakadabra
+              Recuperar conta
             </Text>
           </Flex>
           <Flex
@@ -92,22 +99,23 @@ const Login: NextPage = () => {
             padding="30px"
             paddingLeft="40px"
             paddingRight="40px"
-            onSubmit={sendLogin}
+            onSubmit={sendRecoveryPassword}
           >
             <Input
-              id="login"
-              name="login"
-              placeholder="Seu e-mail"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              id="password1"
+              name="password1"
+              placeholder="Sua nova senha"
+              type="password"
+              value={password1}
+              onChange={e => setPassword1(e.target.value)}
               width="100%"
               height="40px"
               fontSize="18px"
               backgroundColor="#FAFAFA"
               border="1px solid #7E7979"
-              paddingLeft="10px"
               borderRadius="2px"
+              paddingLeft="10px"
+              marginTop="12px"
               sx={{
                 '@media screen and (max-width: 400px)': {
                   height: '50px'
@@ -115,12 +123,12 @@ const Login: NextPage = () => {
               }}
             />
             <Input
-              id="password"
-              name="password"
-              placeholder="Sua senha"
+              id="password2"
+              name="password2"
+              placeholder="Repita sua nova senha"
               type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+              value={password2}
+              onChange={e => setPassword2(e.target.value)}
               width="100%"
               height="40px"
               fontSize="18px"
@@ -143,7 +151,7 @@ const Login: NextPage = () => {
               backgroundColor="#009879"
               color="#ffffff"
               border="0"
-              disabled={loading}
+              disabled={!validButton}
               _disabled={{
                 backgroundColor: '#9B9191'
               }}
@@ -153,23 +161,8 @@ const Login: NextPage = () => {
                 }
               }}
             >
-              Logar
+              Trocar senha
             </Button>
-            <Flex
-              width="100%"
-              marginTop="10px"
-            >
-              <Text
-                color="#1584C0"
-                cursor="pointer"
-                onClick={showRecoveryPassword}
-                _hover={{
-                  textDecoration: 'underline'
-                }}
-              >
-                Esqueci minha senha
-              </Text>
-            </Flex>
           </Flex>
         </Flex>
       </Flex>
@@ -178,15 +171,17 @@ const Login: NextPage = () => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = requireSession(context.req.cookies.session, false)
+  const query = context.query?.recoverycode as string | undefined
+  const recoveryCodesSchema = await RecoveryCodesSchema()
+  const recoveryCode = await recoveryCodesSchema.findOne({
+    code: query
+  })
   return {
-    props: {},
-    ...(session !== undefined) && {
-      redirect: {
-        destination: '/'
-      }
-    }
+    props: {
+      recoveryCode: query
+    },
+    notFound: recoveryCode === null
   }
 }
 
-export default Login
+export default Recovery
