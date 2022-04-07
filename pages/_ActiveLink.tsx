@@ -12,19 +12,21 @@ const ActiveLink: React.FunctionComponent<IActiveLink> = ({fuzzy = false, href, 
   const router = useRouter()
   let className = children?.props?.className || ''
 
-  const hrefTokens = href?.substring(1)?.split('/')
-  const pathTokens = router?.asPath?.substring(1)?.split('/')
+  const hrefTokens = href?.substring(1)?.split('/') as String[] | undefined
+  const pathTokens = router?.asPath?.substring(1)?.split('/') as String[] | undefined
 
-  let matched = false
-  for (let i = 0; i < hrefTokens.length; i++) {
-    if (hrefTokens[i] === pathTokens[i]) {
-      matched = true
-      break
+  if (hrefTokens && pathTokens) {
+    let matched = false
+    for (let i = 0; i < hrefTokens.length; i++) {
+      if (hrefTokens[i] === pathTokens[i]) {
+        matched = true
+        break
+      }
     }
-  }
 
-  if ((!fuzzy && router.asPath === href) || (fuzzy && matched)) {
-    className = `${className} active`
+    if ((!fuzzy && router.asPath === href) || (fuzzy && matched)) {
+      className = `${className} active`
+    }
   }
 
   return (
