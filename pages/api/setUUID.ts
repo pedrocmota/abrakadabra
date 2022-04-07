@@ -22,22 +22,27 @@ export default async (req: ExtendedNextApiRequest<ISetUUIDRequest>, res: NextApi
         token: req.body.token
       })
       if (machine) {
-        const cardWithoutUUID = (await cardSchema.findOne({
-          status: 3
-        }))
-        if (cardWithoutUUID) {
-          if (req.body.uuid.length > 3 && req.body.uuid.length < 10) {
-            await cardSchema.updateOne({status: 3}, {
-              $set: {
-                status: 1, uuid: req.body.uuid
-              }
-            })
-            return res.status(200).end()
+        const uuidExist = await cardSchema.findOne({uuid: req.body.uuid}) !== null
+        if (!uuidExist) {
+          const cardWithoutUUID = (await cardSchema.findOne({
+            status: 3
+          }))
+          if (cardWithoutUUID) {
+            if (req.body.uuid.length > 3 && req.body.uuid.length < 10) {
+              await cardSchema.updateOne({status: 3}, {
+                $set: {
+                  status: 1, uuid: req.body.uuid
+                }
+              })
+              return res.status(200).end()
+            } else {
+              return res.status(405).end()
+            }
           } else {
-            return res.status(405).end()
+            return res.status(404).end()
           }
         } else {
-          return res.status(404).end()
+          return res.status(409).end()
         }
       } else {
         return res.status(401).end()

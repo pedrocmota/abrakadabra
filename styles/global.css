@@ -80,3 +80,23 @@ body {
 .swal2-confirm:focus {
   box-shadow: 0 0 0 3px rgb(3 167 134 / 50%) !important;
 }
+
+.nav-link:hover {
+  color: #ffffff !important;
+}
+
+.nav-link > a:hover {
+  color: #ffffff !important;
+}
+
+.active {
+  color: #23d8ab !important;
+}
+
+@media only screen and (max-width: 991px) {
+  .nav-link {
+    display: flex;
+    align-items: center;
+    height: 46px;
+  }
+}

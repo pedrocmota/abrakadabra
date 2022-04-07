@@ -1,6 +1,7 @@
 import React from 'react'
 import {Navbar, Container, Nav, NavDropdown} from 'react-bootstrap'
 import Link from 'next/link'
+import ActiveLink from './_ActiveLink'
 
 interface IMenubar {
   name: string,
@@ -22,24 +23,24 @@ const Menubar: React.FunctionComponent<IMenubar> = (props) => {
             {(props.isAdmin) && (
               <>
                 <Nav.Link as="span">
-                  <Link href="/acessos">
+                  <ActiveLink href="/acessos">
                     <a>Histórico de acessos</a>
-                  </Link>
+                  </ActiveLink>
                 </Nav.Link>
                 <Nav.Link as="span">
-                  <Link href="/cartoes">
+                  <ActiveLink href="/cartoes">
                     <a>Cartões registrados</a>
-                  </Link>
+                  </ActiveLink>
                 </Nav.Link>
                 <Nav.Link as="span">
-                  <Link href="/maquinas">
+                  <ActiveLink href="/maquinas">
                     <a>Máquinas registradas</a>
-                  </Link>
+                  </ActiveLink>
                 </Nav.Link>
                 <Nav.Link as="span">
-                  <Link href="/contas">
+                  <ActiveLink href="/contas">
                     <a>Contas registradas</a>
-                  </Link>
+                  </ActiveLink>
                 </Nav.Link>
               </>
             )}
