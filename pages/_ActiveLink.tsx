@@ -12,8 +12,8 @@ const ActiveLink: React.FunctionComponent<IActiveLink> = ({fuzzy = false, href, 
   const router = useRouter()
   let className = children?.props?.className || ''
 
-  const hrefTokens = href.substring(1).split('/')
-  const pathTokens = router.asPath.substring(1).split('/')
+  const hrefTokens = href?.substring(1)?.split('/')
+  const pathTokens = router?.asPath?.substring(1)?.split('/')
 
   let matched = false
   for (let i = 0; i < hrefTokens.length; i++) {
