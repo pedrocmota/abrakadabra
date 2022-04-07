@@ -1,7 +1,7 @@
 import React from 'react'
 import {Navbar, Container, Nav, NavDropdown} from 'react-bootstrap'
 import Link from 'next/link'
-import ActiveLink from './_ActiveLink'
+import ActiveLink from './ActiveLink'
 
 interface IMenubar {
   name: string,

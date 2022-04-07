@@ -1,7 +1,7 @@
 import React from 'react'
 import {Flex, Box, Text, Link} from '@chakra-ui/react'
 import getConfig from 'next/config'
-import {IpublicRuntimeConfig} from '../utils/types/environment.d'
+import {IpublicRuntimeConfig} from '../utils/types/environment'
 
 const Footer: React.FunctionComponent = () => {
   const publicRuntimeConfig = getConfig().publicRuntimeConfig as IpublicRuntimeConfig

@@ -2,8 +2,8 @@ import {createRef, useEffect, useState} from 'react'
 import type {NextPage} from 'next'
 import {GetServerSideProps} from 'next'
 import Head from 'next/head'
-import Navbar from './_navbar'
-import Footer from './_footer'
+import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 import {
   Flex,
   Container,
