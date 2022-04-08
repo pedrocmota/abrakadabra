@@ -5,30 +5,39 @@ import {Flex, Box, Button, Input, Select} from '@chakra-ui/react'
 import {toasts} from '../pages/_app'
 import axios from 'axios'
 
-export const showAddMachine = (closeCallback: () => void) => {
+export const showAddCard = (props: IAddCard, closeCallback: () => void) => {
   const MySwal = withReactContent(Swal)
   return MySwal.fire({
-    title: 'Adicionar máquina',
-    html: <AddMachine />,
+    title: 'Adicionar cartão',
+    html: <AddCard users={props.users} />,
     showDenyButton: false,
     showConfirmButton: false,
     didClose: () => closeCallback()
   })
 }
 
-const AddMachine: React.FunctionComponent = () => {
+interface IAddCard {
+  users: {
+    _id: string,
+    name: string
+  }[]
+}
+
+const AddCard: React.FunctionComponent<IAddCard> = (props) => {
   const [alias, setAlias] = useState('')
+  const [user, setUser] = useState('')
   const [loading, setLoading] = useState(false)
-  const validButton = alias.length > 3 && alias.length < 30 && !loading
+  const validButton = alias.length > 3 && alias.length < 30 && user.length > 0 && !loading
   const {addToast} = toasts
 
-  const createMachine = (event: FormEvent) => {
+  const createCard = (event: FormEvent) => {
     event.preventDefault()
     setLoading(true)
-    axios.post('/api/createMachine', {
-      alias: alias
+    axios.post('/api/createCard', {
+      alias: alias,
+      userID: user
     }).then(() => {
-      addToast('Máquina criada com sucesso!', {appearance: 'success'})
+      addToast('Cartão criado com sucesso!', {appearance: 'success'})
       Swal.close()
     }).catch((error) => {
       setLoading(false)
@@ -45,9 +54,9 @@ const AddMachine: React.FunctionComponent = () => {
       marginTop="15px"
     >
       <Input
-        id="machineAlias"
+        id="aliasCard"
         type="text"
-        placeholder="Digite o nome da máquina"
+        placeholder="Digite o nome do cartão"
         width="100%"
         height="45px"
         fontSize="16px"
@@ -59,7 +68,23 @@ const AddMachine: React.FunctionComponent = () => {
         }}
         onChange={(e) => {setAlias(e.target.value)}}
       />
-
+      <Select
+        placeholder="Selecione o usuário"
+        width="100%"
+        height="45px"
+        backgroundColor="#ffffff"
+        border="1px solid #DADADA"
+        fontSize="16px"
+        borderRadius="3px"
+        marginTop="10px"
+        onChange={(e) => setUser(e.currentTarget.value)}
+      >
+        {(props.users.map(user => {
+          return (
+            <option key={user._id} value={user._id}>{user.name}</option>
+          )
+        }))}
+      </Select>
       <Box marginTop="20px">
         <Button
           type="submit"
@@ -70,7 +95,7 @@ const AddMachine: React.FunctionComponent = () => {
           borderRadius="2px"
           color="#ffffff"
           disabled={!validButton}
-          onClick={createMachine}
+          onClick={createCard}
           _disabled={{
             backgroundColor: '#9B9191 !important'
           }}
@@ -78,7 +103,7 @@ const AddMachine: React.FunctionComponent = () => {
             backgroundColor: '#03A786'
           }}
         >
-          Criar máquina
+          Criar cartão
         </Button>
         <Button
           width="150px"

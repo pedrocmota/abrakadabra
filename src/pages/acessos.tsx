@@ -1,4 +1,4 @@
-import {createRef, useState} from 'react'
+import {createRef, useEffect, useState} from 'react'
 import type {NextPage} from 'next'
 import {GetServerSideProps} from 'next'
 import Head from 'next/head'
@@ -8,38 +8,54 @@ import {
   Flex,
   Container,
   Input,
-  Button,
+  Select,
   Table,
   Th,
+  Button,
   Text,
   Thead
 } from '@chakra-ui/react'
+import dayjs from 'dayjs'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
-import {showAddUser} from '../popups/showAddUser'
 import {requireSession} from '../utils/request'
 import {getUserProps} from '../models/getUserProps'
-import {IProfileData, IUsers} from '../models/Schemas'
+import {IProfileData, IAccess} from '../models/Schemas'
 
-interface IAccountsProps extends IProfileData {
-  userID: string,
-  isAdmin: boolean,
-  users: IUsers[]
+interface IAccessesProps extends IProfileData {
+  users: {
+    _id: string,
+    name: string
+  }[]
 }
 
-const Accounts: NextPage<IAccountsProps> = (props) => {
-  const [data, setData] = useState<IUsers[]>(props.users)
+const Accesses: NextPage<IAccessesProps> = (props) => {
+  const [user, setUser] = useState('')
+  const [data, setData] = useState<IAccess[]>([])
+  const [loading, setLoading] = useState(false)
+
   const {addToast} = useToasts()
   const table = createRef<HTMLTableElement>()
+  const accesses = data.filter(e => e.user === user)
 
-  const refresh = async () => {
-    const response = await axios.get('/api/getUsers')
-    setData(response.data)
-  }
+  useEffect(() => {
+    setLoading(true);
+    (async () => {
+      if (user !== '') {
+        const response = await axios.get('/api/getAccessesByUser', {
+          params: {
+            userID: user
+          }
+        })
+        setLoading(false)
+        setData(response.data)
+      }
+    })()
+  }, [user])
 
-  const deleteUser = (userID: string) => {
+  const deleteAccess = (accessID: string) => {
     Swal.fire({
       title: 'Você confirma a ação?',
       showDenyButton: true,
@@ -47,14 +63,14 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
       denyButtonText: 'Não'
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const response = await axios.delete('/api/deleteUser', {
+        const response = await axios.delete('/api/deleteAccess', {
           data: {
-            userID: userID
+            accessID: accessID
           }
         })
         if (response.status === 200) {
-          setData(data.filter((e) => (e._id !== userID)))
-          addToast('Usuário deletado com sucesso!', {appearance: 'success'})
+          setData(data.filter((e) => (e._id !== accessID)))
+          addToast('Acesso deletado com sucesso!', {appearance: 'success'})
         } else {
           addToast(`Erro desconhecido. Status code ${response.status}`, {appearance: 'error'})
         }
@@ -65,7 +81,7 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
   return (
     <>
       <Head>
-        <title>Abrakadabra - Contas registradas</title>
+        <title>Abrakadabra - Histórico de acessos</title>
       </Head>
       <Flex
         as="div"
@@ -101,35 +117,21 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
               marginBottom="25px"
               paddingLeft="1px"
             >
-              Contas registradas
+              Histórico de acessos
             </Text>
-            <Button
-              width="240px"
-              height="34px"
-              marginBottom="15px"
-              backgroundColor="#009879"
-              border="0"
-              borderRadius="2px"
-              color="#ffffff"
-              padding="10px"
-              onClick={() => showAddUser(() => refresh())}
-              sx={{
-                '@media screen and (max-width: 614px)': {
-                  width: '100%',
-                  height: '40px'
-                }
-              }}
-              _hover={{
-                backgroundColor: '#03A786'
-              }}
-            >
-              Cadastrar nova conta
-            </Button>
             <Flex
               display="flex"
               __css={{
                 '& select': {
                   paddingRight: '0px'
+                },
+                '@media screen and (max-width: 520px)': {
+                  flexDirection: 'column',
+                  '& .chakra-select__wrapper': {
+                    width: '100%',
+                    marginLeft: '0px',
+                    marginTop: '10px'
+                  }
                 }
               }}
             >
@@ -145,8 +147,34 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
                 _placeholder={{
                   color: '#212529'
                 }}
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    height: '40px'
+                  }
+                }}
                 onChange={(e) => {filter(e.target.value, table.current)}}
               />
+              <Select
+                placeholder="Selecione o usuário"
+                width="200px"
+                height="34px"
+                backgroundColor="#ffffff"
+                border="1px solid #DADADA"
+                borderRadius="3px"
+                marginLeft="10px"
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    height: '40px'
+                  }
+                }}
+                onChange={(e) => setUser(e.currentTarget.value)}
+              >
+                {(props.users.map(user => {
+                  return (
+                    <option key={user._id} value={user._id}>{user.name}</option>
+                  )
+                }))}
+              </Select>
             </Flex>
             <Flex overflowX="auto">
               <Table ref={table}
@@ -175,44 +203,50 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
                   fontSize="16px"
                   color="#ffffff"
                   text-align="left"
+                  paddingRight="10px"
+                  sx={{
+                    '@media screen and (max-width: 614px)': {
+                      '& th': {
+                        paddingTop: '8px',
+                        paddingBottom: '8px'
+                      }
+                    }
+                  }}
                 >
                   <tr id="thdead">
-                    <Th>Nome</Th>
-                    <Th>Tipo de usuário</Th>
+                    <Th>Data/horário</Th>
+                    <Th>Pessoa</Th>
+                    <Th>Lugar</Th>
                     <Th width="220px">Ação</Th>
                   </tr>
                 </Thead>
                 <tbody>
-                  {(data.map((user) => {
+                  {(accesses.map((access) => {
                     return (
-                      <tr key={user._id}>
-                        <td>{user.name}</td>
+                      <tr key={access._id}>
+                        <td>{dayjs.unix(access.datetime).format('DD/MM/YYYY HH:mm:ss')}</td>
+                        <td>{access.userName}</td>
+                        <td>{access.place}</td>
                         <td>
-                          {user.admin && 'Administrador'}
-                          {!user.admin && 'Usuário comum'}
-                        </td>
-                        <td>
-                          {(props.userID !== user._id) && (
-                            <Button
-                              width="100%"
-                              height="30px"
-                              backgroundColor="#CE505B"
-                              border="0"
-                              borderRadius="2px"
-                              color="#ffffff"
-                              padding="10px"
-                              onClick={() => deleteUser(user._id as string)}
-                              disabled={props.userID === user._id}
-                              _disabled={{
-                                backgroundColor: '#9B9191'
-                              }}
-                              _hover={{
-                                backgroundColor: '#DD5E69'
-                              }}
-                            >
-                              Deletar usuário
-                            </Button>
-                          )}
+                          <Button
+                            width="100%"
+                            height="30px"
+                            backgroundColor="#CE505B"
+                            border="0"
+                            borderRadius="2px"
+                            color="#ffffff"
+                            padding="10px"
+                            marginTop="10px"
+                            onClick={() => deleteAccess(access._id as string)}
+                            _disabled={{
+                              backgroundColor: '#9B9191'
+                            }}
+                            _hover={{
+                              backgroundColor: '#DD5E69'
+                            }}
+                          >
+                            Deletar acesso
+                          </Button>
                         </td>
                       </tr>
                     )
@@ -220,14 +254,24 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
                 </tbody>
               </Table>
             </Flex>
-            {(data.length === 0) && (
+            {(accesses.length === 0 && user === '') && (
               <Text
                 width="100%"
                 textAlign="center"
                 marginTop="20px"
                 fontSize="22px"
               >
-                Não há contas registradas
+                Selecione um usuário
+              </Text>
+            )}
+            {(!loading && accesses.length === 0 && user !== '') && (
+              <Text
+                width="100%"
+                textAlign="center"
+                marginTop="20px"
+                fontSize="22px"
+              >
+                O usuário não tem acessos registrados
               </Text>
             )}
           </Flex>
@@ -243,10 +287,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     const props = await getUserProps(session.userID)
     return {
-      props: {
-        userID: session.userID,
-        ...props!
-      }
+      props: props!
     }
   } else {
     return {
@@ -258,4 +299,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 }
 
-export default Accounts
+export default Accesses

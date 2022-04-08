@@ -103,6 +103,7 @@ const AddUser: React.FunctionComponent = () => {
         width="100%"
         height="45px"
         fontSize="16px"
+        backgroundColor="#ffffff"
         border="1px solid #DADADA"
         borderRadius="3px"
         marginTop="10px"

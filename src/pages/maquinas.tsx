@@ -1,4 +1,4 @@
-import {createRef, useEffect, useState} from 'react'
+import {createRef, useState} from 'react'
 import type {NextPage} from 'next'
 import {GetServerSideProps} from 'next'
 import Head from 'next/head'
@@ -8,54 +8,36 @@ import {
   Flex,
   Container,
   Input,
-  Select,
+  Button,
   Table,
   Th,
-  Button,
   Text,
   Thead
 } from '@chakra-ui/react'
-import dayjs from 'dayjs'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
+import {showAddMachine} from '../popups/showAddMachine'
 import {requireSession} from '../utils/request'
-import {getUserProps} from '../models/getUserProps'
-import {IProfileData, IAccess} from '../models/Schemas'
+import {getMachinesProps} from '../models/getMachinesProps'
+import {IProfileData, IMachines} from '../models/Schemas'
 
-interface IAccessesProps extends IProfileData {
-  users: {
-    _id: string,
-    name: string
-  }[]
+interface IMachinesProps extends IProfileData {
+  machines: IMachines[]
 }
 
-const Accesses: NextPage<IAccessesProps> = (props) => {
-  const [user, setUser] = useState('')
-  const [data, setData] = useState<IAccess[]>([])
-  const [loading, setLoading] = useState(false)
-
+const Machines: NextPage<IMachinesProps> = (props) => {
+  const [data, setData] = useState<IMachines[]>(props.machines)
   const {addToast} = useToasts()
   const table = createRef<HTMLTableElement>()
-  const accesses = data.filter(e => e.user === user)
 
-  useEffect(() => {
-    setLoading(true);
-    (async () => {
-      if (user !== '') {
-        const response = await axios.get('/api/getAccessesByUser', {
-          params: {
-            userID: user
-          }
-        })
-        setLoading(false)
-        setData(response.data)
-      }
-    })()
-  }, [user])
+  const refresh = async () => {
+    const response = await axios.get('/api/getMachines')
+    setData(response.data)
+  }
 
-  const deleteAccess = (accessID: string) => {
+  const deleteMachine = (machineID: string) => {
     Swal.fire({
       title: 'Você confirma a ação?',
       showDenyButton: true,
@@ -63,14 +45,14 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
       denyButtonText: 'Não'
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const response = await axios.delete('/api/deleteAccess', {
+        const response = await axios.delete('/api/deleteMachine', {
           data: {
-            accessID: accessID
+            machineID: machineID
           }
         })
         if (response.status === 200) {
-          setData(data.filter((e) => (e._id !== accessID)))
-          addToast('Acesso deletado com sucesso!', {appearance: 'success'})
+          setData(data.filter((e) => (e._id !== machineID)))
+          addToast('Máquina deletada com sucesso!', {appearance: 'success'})
         } else {
           addToast(`Erro desconhecido. Status code ${response.status}`, {appearance: 'error'})
         }
@@ -81,7 +63,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
   return (
     <>
       <Head>
-        <title>Abrakadabra - Histórico de acessos</title>
+        <title>Abrakadabra - Máquinas registradas</title>
       </Head>
       <Flex
         as="div"
@@ -117,21 +99,35 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
               marginBottom="25px"
               paddingLeft="1px"
             >
-              Histórico de acessos
+              Máquinas registradas
             </Text>
+            <Button
+              width="240px"
+              height="34px"
+              marginBottom="15px"
+              backgroundColor="#009879"
+              border="0"
+              borderRadius="2px"
+              color="#ffffff"
+              padding="10px"
+              onClick={() => showAddMachine(() => refresh())}
+              sx={{
+                '@media screen and (max-width: 614px)': {
+                  width: '100%',
+                  height: '40px'
+                }
+              }}
+              _hover={{
+                backgroundColor: '#03A786'
+              }}
+            >
+              Cadastrar nova máquina
+            </Button>
             <Flex
               display="flex"
               __css={{
                 '& select': {
                   paddingRight: '0px'
-                },
-                '@media screen and (max-width: 520px)': {
-                  flexDirection: 'column',
-                  '& .chakra-select__wrapper': {
-                    width: '100%',
-                    marginLeft: '0px',
-                    marginTop: '10px'
-                  }
                 }
               }}
             >
@@ -144,26 +140,17 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                 paddingLeft="6px"
                 border="1px solid #DADADA"
                 borderRadius="3px"
+                paddingRight="10px"
                 _placeholder={{
                   color: '#212529'
                 }}
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    height: '40px'
+                  }
+                }}
                 onChange={(e) => {filter(e.target.value, table.current)}}
               />
-              <Select
-                placeholder="Selecione o usuário"
-                width="200px"
-                height="34px"
-                border="1px solid #DADADA"
-                borderRadius="3px"
-                marginLeft="10px"
-                onChange={(e) => setUser(e.currentTarget.value)}
-              >
-                {(props.users.map(user => {
-                  return (
-                    <option key={user._id} value={user._id}>{user.name}</option>
-                  )
-                }))}
-              </Select>
             </Flex>
             <Flex overflowX="auto">
               <Table ref={table}
@@ -192,21 +179,27 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                   fontSize="16px"
                   color="#ffffff"
                   text-align="left"
+                  sx={{
+                    '@media screen and (max-width: 614px)': {
+                      '& th': {
+                        paddingTop: '8px',
+                        paddingBottom: '8px'
+                      }
+                    }
+                  }}
                 >
                   <tr id="thdead">
-                    <Th>Data/horário</Th>
-                    <Th>Pessoa</Th>
-                    <Th>Lugar</Th>
+                    <Th>Código máquinas</Th>
+                    <Th>Nome da máquinas</Th>
                     <Th width="220px">Ação</Th>
                   </tr>
                 </Thead>
                 <tbody>
-                  {(accesses.map((access) => {
+                  {(data.map((machine) => {
                     return (
-                      <tr key={access._id}>
-                        <td>{dayjs.unix(access.datetime).format('DD/MM/YYYY HH:mm:ss')}</td>
-                        <td>{access.userName}</td>
-                        <td>{access.place}</td>
+                      <tr key={machine._id}>
+                        <td>{machine.token}</td>
+                        <td>{machine.alias}</td>
                         <td>
                           <Button
                             width="100%"
@@ -216,8 +209,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                             borderRadius="2px"
                             color="#ffffff"
                             padding="10px"
-                            marginTop="10px"
-                            onClick={() => deleteAccess(access._id as string)}
+                            onClick={() => deleteMachine(machine._id as string)}
                             _disabled={{
                               backgroundColor: '#9B9191'
                             }}
@@ -225,7 +217,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                               backgroundColor: '#DD5E69'
                             }}
                           >
-                            Deletar acesso
+                            Deletar máquina
                           </Button>
                         </td>
                       </tr>
@@ -234,24 +226,14 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                 </tbody>
               </Table>
             </Flex>
-            {(accesses.length === 0 && user === '') && (
+            {(data.length === 0) && (
               <Text
                 width="100%"
                 textAlign="center"
                 marginTop="20px"
                 fontSize="22px"
               >
-                Selecione um usuário
-              </Text>
-            )}
-            {(!loading && accesses.length === 0 && user !== '') && (
-              <Text
-                width="100%"
-                textAlign="center"
-                marginTop="20px"
-                fontSize="22px"
-              >
-                O usuário não tem acessos registrados
+                Não há maquinas registradas
               </Text>
             )}
           </Flex>
@@ -265,7 +247,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = requireSession(context.req.cookies.session, true)
   if (session) {
-    const props = await getUserProps(session.userID)
+    const props = await getMachinesProps(session.userID)
     return {
       props: props!
     }
@@ -279,4 +261,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 }
 
-export default Accesses
+export default Machines

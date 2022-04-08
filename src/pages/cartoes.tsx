@@ -197,8 +197,14 @@ const Cards: NextPage<ICardsProps> = (props) => {
                 paddingLeft="6px"
                 border="1px solid #DADADA"
                 borderRadius="3px"
+                paddingRight="10px"
                 _placeholder={{
                   color: '#212529'
+                }}
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    height: '40px'
+                  }
                 }}
                 onChange={(e) => {filter(e.target.value, table.current)}}
               />
@@ -206,9 +212,15 @@ const Cards: NextPage<ICardsProps> = (props) => {
                 placeholder="Selecione o usuário"
                 width="200px"
                 height="34px"
+                backgroundColor="#ffffff"
                 border="1px solid #DADADA"
                 borderRadius="3px"
                 marginLeft="10px"
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    height: '40px'
+                  }
+                }}
                 onChange={(e) => setUser(e.currentTarget.value)}
               >
                 {(props.users.map(user => {
@@ -245,6 +257,14 @@ const Cards: NextPage<ICardsProps> = (props) => {
                   fontSize="16px"
                   color="#ffffff"
                   text-align="left"
+                  sx={{
+                    '@media screen and (max-width: 614px)': {
+                      '& th': {
+                        paddingTop: '8px',
+                        paddingBottom: '8px'
+                      }
+                    }
+                  }}
                 >
                   <tr id="thdead">
                     <Th>Código do cartão</Th>

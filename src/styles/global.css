@@ -93,6 +93,12 @@ body {
   color: #23d8ab !important;
 }
 
+input:focus, select:focus {
+  outline: none;
+  border-color: #009879;
+  box-shadow: 0 0 2px #009879;
+}
+
 @media only screen and (max-width: 991px) {
   .nav-link {
     display: flex;

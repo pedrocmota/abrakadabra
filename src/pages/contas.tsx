@@ -18,26 +18,28 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
-import {showAddMachine} from '../popups/showAddMachine'
+import {showAddUser} from '../popups/showAddUser'
 import {requireSession} from '../utils/request'
-import {getMachinesProps} from '../models/getMachinesProps'
-import {IProfileData, IMachines} from '../models/Schemas'
+import {getUserProps} from '../models/getUserProps'
+import {IProfileData, IUsers} from '../models/Schemas'
 
-interface IMachinesProps extends IProfileData {
-  machines: IMachines[]
+interface IAccountsProps extends IProfileData {
+  userID: string,
+  isAdmin: boolean,
+  users: IUsers[]
 }
 
-const Machines: NextPage<IMachinesProps> = (props) => {
-  const [data, setData] = useState<IMachines[]>(props.machines)
+const Accounts: NextPage<IAccountsProps> = (props) => {
+  const [data, setData] = useState<IUsers[]>(props.users)
   const {addToast} = useToasts()
   const table = createRef<HTMLTableElement>()
 
   const refresh = async () => {
-    const response = await axios.get('/api/getMachines')
+    const response = await axios.get('/api/getUsers')
     setData(response.data)
   }
 
-  const deleteMachine = (machineID: string) => {
+  const deleteUser = (userID: string) => {
     Swal.fire({
       title: 'Você confirma a ação?',
       showDenyButton: true,
@@ -45,14 +47,14 @@ const Machines: NextPage<IMachinesProps> = (props) => {
       denyButtonText: 'Não'
     }).then(async (result) => {
       if (result.isConfirmed) {
-        const response = await axios.delete('/api/deleteMachine', {
+        const response = await axios.delete('/api/deleteUser', {
           data: {
-            machineID: machineID
+            userID: userID
           }
         })
         if (response.status === 200) {
-          setData(data.filter((e) => (e._id !== machineID)))
-          addToast('Máquina deletada com sucesso!', {appearance: 'success'})
+          setData(data.filter((e) => (e._id !== userID)))
+          addToast('Usuário deletado com sucesso!', {appearance: 'success'})
         } else {
           addToast(`Erro desconhecido. Status code ${response.status}`, {appearance: 'error'})
         }
@@ -63,7 +65,7 @@ const Machines: NextPage<IMachinesProps> = (props) => {
   return (
     <>
       <Head>
-        <title>Abrakadabra - Máquinas registradas</title>
+        <title>Abrakadabra - Contas registradas</title>
       </Head>
       <Flex
         as="div"
@@ -99,7 +101,7 @@ const Machines: NextPage<IMachinesProps> = (props) => {
               marginBottom="25px"
               paddingLeft="1px"
             >
-              Máquinas registradas
+              Contas registradas
             </Text>
             <Button
               width="240px"
@@ -110,7 +112,7 @@ const Machines: NextPage<IMachinesProps> = (props) => {
               borderRadius="2px"
               color="#ffffff"
               padding="10px"
-              onClick={() => showAddMachine(() => refresh())}
+              onClick={() => showAddUser(() => refresh())}
               sx={{
                 '@media screen and (max-width: 614px)': {
                   width: '100%',
@@ -121,7 +123,7 @@ const Machines: NextPage<IMachinesProps> = (props) => {
                 backgroundColor: '#03A786'
               }}
             >
-              Cadastrar nova máquina
+              Cadastrar nova conta
             </Button>
             <Flex
               display="flex"
@@ -140,8 +142,14 @@ const Machines: NextPage<IMachinesProps> = (props) => {
                 paddingLeft="6px"
                 border="1px solid #DADADA"
                 borderRadius="3px"
+                paddingRight="10px"
                 _placeholder={{
                   color: '#212529'
+                }}
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    height: '40px'
+                  }
                 }}
                 onChange={(e) => {filter(e.target.value, table.current)}}
               />
@@ -173,38 +181,52 @@ const Machines: NextPage<IMachinesProps> = (props) => {
                   fontSize="16px"
                   color="#ffffff"
                   text-align="left"
+                  sx={{
+                    '@media screen and (max-width: 614px)': {
+                      '& th': {
+                        paddingTop: '8px',
+                        paddingBottom: '8px'
+                      }
+                    }
+                  }}
                 >
                   <tr id="thdead">
-                    <Th>Código máquinas</Th>
-                    <Th>Nome da máquinas</Th>
+                    <Th>Nome</Th>
+                    <Th>Tipo de usuário</Th>
                     <Th width="220px">Ação</Th>
                   </tr>
                 </Thead>
                 <tbody>
-                  {(data.map((machine) => {
+                  {(data.map((user) => {
                     return (
-                      <tr key={machine._id}>
-                        <td>{machine.token}</td>
-                        <td>{machine.alias}</td>
+                      <tr key={user._id}>
+                        <td>{user.name}</td>
                         <td>
-                          <Button
-                            width="100%"
-                            height="30px"
-                            backgroundColor="#CE505B"
-                            border="0"
-                            borderRadius="2px"
-                            color="#ffffff"
-                            padding="10px"
-                            onClick={() => deleteMachine(machine._id as string)}
-                            _disabled={{
-                              backgroundColor: '#9B9191'
-                            }}
-                            _hover={{
-                              backgroundColor: '#DD5E69'
-                            }}
-                          >
-                            Deletar máquina
-                          </Button>
+                          {user.admin && 'Administrador'}
+                          {!user.admin && 'Usuário comum'}
+                        </td>
+                        <td>
+                          {(props.userID !== user._id) && (
+                            <Button
+                              width="100%"
+                              height="30px"
+                              backgroundColor="#CE505B"
+                              border="0"
+                              borderRadius="2px"
+                              color="#ffffff"
+                              padding="10px"
+                              onClick={() => deleteUser(user._id as string)}
+                              disabled={props.userID === user._id}
+                              _disabled={{
+                                backgroundColor: '#9B9191'
+                              }}
+                              _hover={{
+                                backgroundColor: '#DD5E69'
+                              }}
+                            >
+                              Deletar usuário
+                            </Button>
+                          )}
                         </td>
                       </tr>
                     )
@@ -219,7 +241,7 @@ const Machines: NextPage<IMachinesProps> = (props) => {
                 marginTop="20px"
                 fontSize="22px"
               >
-                Não há maquinas registradas
+                Não há contas registradas
               </Text>
             )}
           </Flex>
@@ -233,9 +255,12 @@ const Machines: NextPage<IMachinesProps> = (props) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = requireSession(context.req.cookies.session, true)
   if (session) {
-    const props = await getMachinesProps(session.userID)
+    const props = await getUserProps(session.userID)
     return {
-      props: props!
+      props: {
+        userID: session.userID,
+        ...props!
+      }
     }
   } else {
     return {
@@ -247,4 +272,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 }
 
-export default Machines
+export default Accounts

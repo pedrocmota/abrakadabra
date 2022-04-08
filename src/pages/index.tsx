@@ -216,8 +216,14 @@ const Home: NextPage<IHome> = (props) => {
                 paddingLeft="6px"
                 border="1px solid #DADADA"
                 borderRadius="3px"
+                paddingRight="10px"
                 _placeholder={{
                   color: '#212529'
+                }}
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    height: '40px'
+                  }
                 }}
                 onChange={(e) => {filter(e.target.value, tableCards.current)}}
               />
@@ -248,6 +254,14 @@ const Home: NextPage<IHome> = (props) => {
                     fontSize="16px"
                     color="#ffffff"
                     text-align="left"
+                    sx={{
+                      '@media screen and (max-width: 614px)': {
+                        '& th': {
+                          paddingTop: '8px',
+                          paddingBottom: '8px'
+                        }
+                      }
+                    }}
                   >
                     <tr id="thdead">
                       <Th>Código do cartão</Th>
@@ -348,8 +362,14 @@ const Home: NextPage<IHome> = (props) => {
                 paddingLeft="6px"
                 border="1px solid #DADADA"
                 borderRadius="3px"
+                paddingRight="10px"
                 _placeholder={{
                   color: '#212529'
+                }}
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    height: '40px'
+                  }
                 }}
                 onChange={(e) => {filter(e.target.value, tableAccesses.current)}}
               />
@@ -381,6 +401,14 @@ const Home: NextPage<IHome> = (props) => {
                     color="#ffffff"
                     text-align="left"
                     whiteSpace="nowrap"
+                    sx={{
+                      '@media screen and (max-width: 614px)': {
+                        '& th': {
+                          paddingTop: '8px',
+                          paddingBottom: '8px'
+                        }
+                      }
+                    }}
                   >
                     <tr id="thdead">
                       <th>Data/Horário</th>
