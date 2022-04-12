@@ -2,6 +2,7 @@ import React, {useState, FormEvent} from 'react'
 import type {NextPage} from 'next'
 import Head from 'next/head'
 import Router from 'next/router'
+import Swal from 'sweetalert2'
 import {Flex, Text, Input, Button} from '@chakra-ui/react'
 import axios from 'axios'
 import {useToasts} from 'react-toast-notifications'
@@ -22,6 +23,7 @@ const Login: NextPage = () => {
       email: email,
       password: password
     }).then(() => {
+      Swal.close()
       Router.push('/')
     }).catch((error) => {
       setLoading(false)
