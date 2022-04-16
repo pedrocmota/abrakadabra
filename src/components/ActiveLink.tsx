@@ -3,17 +3,17 @@ import NextLink from 'next/link'
 import {useRouter} from 'next/router'
 
 interface IActiveLink {
-  fuzzy?: boolean,
   href: string,
   children: any
 }
 
-const ActiveLink: React.FunctionComponent<IActiveLink> = ({fuzzy = false, href, children}) => {
+const ActiveLink: React.FunctionComponent<IActiveLink> = ({href, children}) => {
   const router = useRouter()
   let className = children?.props?.className || ''
 
   const hrefTokens = href?.substring(1)?.split('/') as String[] | undefined
-  const pathTokens = router?.asPath?.substring(1)?.split('/') as String[] | undefined
+  const rawPath = router?.asPath?.substring(1).split('?')[0]
+  const pathTokens = rawPath.split('/') as String[] | undefined
 
   if (hrefTokens && pathTokens) {
     let matched = false
@@ -24,7 +24,7 @@ const ActiveLink: React.FunctionComponent<IActiveLink> = ({fuzzy = false, href, 
       }
     }
 
-    if ((!fuzzy && router.asPath === href) || (fuzzy && matched)) {
+    if (matched) {
       className = `${className} active`
     }
   }
