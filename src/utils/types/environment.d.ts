@@ -8,6 +8,7 @@ declare global {
       MAILER_PORT: string,
       MAILER_USER: string,
       MAILER_PASSWORD: string,
+      CARD_LIMIT: string
     }
   }
 }

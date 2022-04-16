@@ -4,34 +4,19 @@ import {GetServerSideProps} from 'next'
 import Head from 'next/head'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import {
-  Flex,
-  Container,
-  Image,
-  Text,
-  Button,
-  Input,
-  Table,
-  Th,
-  Thead
-} from '@chakra-ui/react'
-import dayjs from 'dayjs'
+import {Flex, Container, Image, Button, Text, Input, Table, Thead, Th} from '@chakra-ui/react'
 import axios from 'axios'
+import dayjs from 'dayjs'
 import Swal from 'sweetalert2'
 import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
 import {showChangeEmail} from '../popups/showChangeEmail'
 import {showChangePassword} from '../popups/showChangePassword'
 import {requireSession} from '../utils/request'
-import {getIndexProps} from '../models/getIndexProps'
-import {IProfileData, ICards, IAccess} from '../models/Schemas'
+import {getIndexProps, IIndex} from '../models/GetIndexProps'
+import {ICards} from '../models/Schemas'
 
-interface IHome extends IProfileData {
-  cards: ICards[],
-  accesses: IAccess[]
-}
-
-const Home: NextPage<IHome> = (props) => {
+const Index: NextPage<IIndex> = (props) => {
   const [cards, setCards] = useState<ICards[]>(props.cards)
   const {addToast} = useToasts()
   const tableCards = createRef<HTMLTableElement>()
@@ -465,4 +450,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 }
 
-export default Home
+export default Index

@@ -12,7 +12,13 @@ export const showChangeEmail = () => {
     title: 'Trocar e-mail',
     html: <ChangeEmail />,
     showDenyButton: false,
-    showConfirmButton: false
+    showConfirmButton: false,
+    showClass: {
+      popup: 'animate__animated animate__zoomIn'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__zoomOut'
+    }
   })
 }
 

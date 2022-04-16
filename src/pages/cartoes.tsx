@@ -2,39 +2,25 @@ import {createRef, useEffect, useState} from 'react'
 import type {NextPage} from 'next'
 import {GetServerSideProps} from 'next'
 import Head from 'next/head'
+import {useRouter} from 'next/router'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import {
-  Flex,
-  Container,
-  Input,
-  Select,
-  Table,
-  Th,
-  Thead,
-  Button,
-  Text
-} from '@chakra-ui/react'
+import {Flex, Container, Input, Button, Select, Text, Table, Th, Thead} from '@chakra-ui/react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
 import {showAddCard} from '../popups/showAddCard'
 import {requireSession} from '../utils/request'
-import {getUserProps} from '../models/getUserProps'
-import {IProfileData, ICards} from '../models/Schemas'
-
-interface ICardsProps extends IProfileData {
-  users: {
-    _id: string,
-    name: string
-  }[]
-}
+import {getCardsProps, ICardsProps} from '../models/GetCardsProps'
+import {ICards} from '../models/Schemas'
 
 const Cards: NextPage<ICardsProps> = (props) => {
-  const [user, setUser] = useState('')
+  const router = useRouter()
+  const [user, setUser] = useState((router.query.user as string) || '')
   const [data, setData] = useState<ICards[]>([])
   const [inReadingMode, setInReadingMode] = useState(false)
+  const [cardsAmount, setCardsAmount] = useState(props.cardsAmount)
   const [loading, setLoading] = useState(false)
   const {addToast} = useToasts()
   const table = createRef<HTMLTableElement>()
@@ -55,6 +41,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
       setLoading(false)
       setData(response.data.cards)
       setInReadingMode(response.data.inReadingMode)
+      setCardsAmount(response.data.cardsAmount)
     }
   }
 
@@ -63,7 +50,13 @@ const Cards: NextPage<ICardsProps> = (props) => {
       title: 'Você confirma a ação?',
       showDenyButton: true,
       confirmButtonText: 'Sim',
-      denyButtonText: 'Não'
+      denyButtonText: 'Não',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut'
+      }
     }).then(async (result) => {
       if (result.isConfirmed) {
         const response = await axios.delete('/api/deleteCard', {
@@ -73,6 +66,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
         })
         if (response.status === 200) {
           setData(data.filter((e) => (e._id !== cardID)))
+          setCardsAmount(cardsAmount - 1)
           addToast('Cartão deletado com sucesso!', {appearance: 'success'})
         } else {
           addToast(`Erro desconhecido. Status code ${response.status}`, {appearance: 'error'})
@@ -86,7 +80,13 @@ const Cards: NextPage<ICardsProps> = (props) => {
       title: 'Você confirma a ação?',
       showDenyButton: true,
       confirmButtonText: 'Sim',
-      denyButtonText: 'Não'
+      denyButtonText: 'Não',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut'
+      }
     }).then(async (result) => {
       if (result.isConfirmed) {
         const response = await axios.post('/api/changeCardStatus', {
@@ -159,6 +159,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
               borderRadius="2px"
               color="#ffffff"
               padding="10px"
+              disabled={cardsAmount === props.cardsLimit}
               onClick={() => showAddCard(props, () => refresh())}
               sx={{
                 '@media screen and (max-width: 614px)': {
@@ -172,6 +173,9 @@ const Cards: NextPage<ICardsProps> = (props) => {
             >
               Cadastrar novo cartão
             </Button>
+            <Text paddingLeft="1px">
+              {cardsAmount} de {props.cardsLimit} cartões registrados
+            </Text>
             <Flex
               display="flex"
               __css={{
@@ -209,6 +213,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
                 onChange={(e) => {filter(e.target.value, table.current)}}
               />
               <Select
+                value={user}
                 placeholder="Selecione o usuário"
                 width="200px"
                 height="34px"
@@ -221,7 +226,18 @@ const Cards: NextPage<ICardsProps> = (props) => {
                     height: '40px'
                   }
                 }}
-                onChange={(e) => setUser(e.currentTarget.value)}
+                onChange={(e) => {
+                  const userID = e.currentTarget.value
+                  setUser(userID)
+                  const urlSearch = new URLSearchParams(window.location.search)
+                  if (userID.length > 0) {
+                    urlSearch.set('user', userID)
+                  } else {
+                    urlSearch.delete('user')
+                  }
+                  const path = window.location.pathname + (userID.length > 0 ? '?' : '') + urlSearch.toString()
+                  history.pushState(null, '', path)
+                }}
               >
                 {(props.users.map(user => {
                   return (
@@ -408,7 +424,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
                 Selecione um usuário
               </Text>
             )}
-            {(!loading && cards.length === 0 && user !== '') && (
+            {(!loading && cards.length === 0 && user !== '' && props.users.some((u) => u._id === user)) && (
               <Text
                 width="100%"
                 textAlign="center"
@@ -416,6 +432,16 @@ const Cards: NextPage<ICardsProps> = (props) => {
                 fontSize="22px"
               >
                 O usuário não tem cartões registrados
+              </Text>
+            )}
+            {(!loading && !props.users.some((u) => u._id === user)) && (
+              <Text
+                width="100%"
+                textAlign="center"
+                marginTop="20px"
+                fontSize="22px"
+              >
+                O usuário não existe
               </Text>
             )}
           </Flex>
@@ -429,7 +455,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = requireSession(context.req.cookies.session, true)
   if (session) {
-    const props = await getUserProps(session.userID)
+    const props = await getCardsProps(session.userID)
     return {
       props: props!
     }

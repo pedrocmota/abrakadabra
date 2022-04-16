@@ -12,6 +12,12 @@ export const showAddCard = (props: IAddCard, closeCallback: () => void) => {
     html: <AddCard users={props.users} />,
     showDenyButton: false,
     showConfirmButton: false,
+    showClass: {
+      popup: 'animate__animated animate__zoomIn'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__zoomOut'
+    },
     didClose: () => closeCallback()
   })
 }

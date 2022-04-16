@@ -4,6 +4,7 @@ import {SSRProvider} from 'react-bootstrap'
 import {ToastProvider, useToasts} from 'react-toast-notifications'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../styles/global.css'
+import '../styles/animations.css'
 import type {AppProps} from 'next/app'
 
 const App = ({Component, pageProps}: AppProps) => {

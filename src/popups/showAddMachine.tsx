@@ -12,6 +12,12 @@ export const showAddMachine = (closeCallback: () => void) => {
     html: <AddMachine />,
     showDenyButton: false,
     showConfirmButton: false,
+    showClass: {
+      popup: 'animate__animated animate__zoomIn'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__zoomOut'
+    },
     didClose: () => closeCallback()
   })
 }

@@ -1,11 +1,17 @@
-import {ObjectId} from 'mongodb'
-import {UsersSchema} from './Schemas'
+import {UsersSchema, IProfileData, IUsers} from './Schemas'
+import {toID, sanitizeID} from '../utils/database'
+
+export interface IAccountsProps extends IProfileData {
+  userID: string,
+  isAdmin: boolean,
+  users: IUsers[]
+}
 
 export const getAccountsProps = async (userID: string) => {
   const usersSchema = await UsersSchema()
 
   const user = await usersSchema.findOne({
-    _id: new ObjectId(userID) as any
+    _id: toID(userID)
   })
   const allAccounts = (await usersSchema.find().toArray()).map(doc => {
     return ({
@@ -18,7 +24,7 @@ export const getAccountsProps = async (userID: string) => {
       name: user.name.split(' ')[0],
       fullname: user.name,
       isAdmin: user.admin,
-      accounts: allAccounts
+      users: sanitizeID(allAccounts)
     }
   }
 }

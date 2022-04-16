@@ -4,28 +4,15 @@ import {GetServerSideProps} from 'next'
 import Head from 'next/head'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import {
-  Flex,
-  Container,
-  Input,
-  Button,
-  Table,
-  Th,
-  Text,
-  Thead
-} from '@chakra-ui/react'
+import {Flex, Container, Input, Button, Text, Table, Thead, Th} from '@chakra-ui/react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
 import {showAddMachine} from '../popups/showAddMachine'
 import {requireSession} from '../utils/request'
-import {getMachinesProps} from '../models/getMachinesProps'
-import {IProfileData, IMachines} from '../models/Schemas'
-
-interface IMachinesProps extends IProfileData {
-  machines: IMachines[]
-}
+import {getMachinesProps, IMachinesProps} from '../models/GetMachinesProps'
+import {IMachines} from '../models/Schemas'
 
 const Machines: NextPage<IMachinesProps> = (props) => {
   const [data, setData] = useState<IMachines[]>(props.machines)
@@ -42,7 +29,13 @@ const Machines: NextPage<IMachinesProps> = (props) => {
       title: 'Você confirma a ação?',
       showDenyButton: true,
       confirmButtonText: 'Sim',
-      denyButtonText: 'Não'
+      denyButtonText: 'Não',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut'
+      }
     }).then(async (result) => {
       if (result.isConfirmed) {
         const response = await axios.delete('/api/deleteMachine', {

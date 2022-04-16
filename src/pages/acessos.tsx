@@ -2,37 +2,22 @@ import {createRef, useEffect, useState} from 'react'
 import type {NextPage} from 'next'
 import {GetServerSideProps} from 'next'
 import Head from 'next/head'
+import {useRouter} from 'next/router'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import {
-  Flex,
-  Container,
-  Input,
-  Select,
-  Table,
-  Th,
-  Button,
-  Text,
-  Thead
-} from '@chakra-ui/react'
+import {Flex, Container, Input, Select, Button, Text, Table, Thead, Th} from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
 import {requireSession} from '../utils/request'
-import {getUserProps} from '../models/getUserProps'
-import {IProfileData, IAccess} from '../models/Schemas'
-
-interface IAccessesProps extends IProfileData {
-  users: {
-    _id: string,
-    name: string
-  }[]
-}
+import {getAccessesProps, IAccessesProps} from '../models/GetAccessesProps'
+import {IAccess} from '../models/Schemas'
 
 const Accesses: NextPage<IAccessesProps> = (props) => {
-  const [user, setUser] = useState('')
+  const router = useRouter()
+  const [user, setUser] = useState((router.query.user as string) || '')
   const [data, setData] = useState<IAccess[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -60,7 +45,13 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
       title: 'Você confirma a ação?',
       showDenyButton: true,
       confirmButtonText: 'Sim',
-      denyButtonText: 'Não'
+      denyButtonText: 'Não',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut'
+      }
     }).then(async (result) => {
       if (result.isConfirmed) {
         const response = await axios.delete('/api/deleteAccess', {
@@ -155,6 +146,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                 onChange={(e) => {filter(e.target.value, table.current)}}
               />
               <Select
+                value={user}
                 placeholder="Selecione o usuário"
                 width="200px"
                 height="34px"
@@ -167,7 +159,18 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                     height: '40px'
                   }
                 }}
-                onChange={(e) => setUser(e.currentTarget.value)}
+                onChange={(e) => {
+                  const userID = e.currentTarget.value
+                  setUser(userID)
+                  const urlSearch = new URLSearchParams(window.location.search)
+                  if (userID.length > 0) {
+                    urlSearch.set('user', userID)
+                  } else {
+                    urlSearch.delete('user')
+                  }
+                  const path = window.location.pathname + (userID.length > 0 ? '?' : '') + urlSearch.toString()
+                  history.pushState(null, '', path)
+                }}
               >
                 {(props.users.map(user => {
                   return (
@@ -264,7 +267,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                 Selecione um usuário
               </Text>
             )}
-            {(!loading && accesses.length === 0 && user !== '') && (
+            {(!loading && accesses.length === 0 && user !== '' && props.users.some((u) => u._id === user)) && (
               <Text
                 width="100%"
                 textAlign="center"
@@ -272,6 +275,16 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
                 fontSize="22px"
               >
                 O usuário não tem acessos registrados
+              </Text>
+            )}
+            {(!loading && !props.users.some((u) => u._id === user)) && (
+              <Text
+                width="100%"
+                textAlign="center"
+                marginTop="20px"
+                fontSize="22px"
+              >
+                O usuário não existe
               </Text>
             )}
           </Flex>
@@ -285,7 +298,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = requireSession(context.req.cookies.session, true)
   if (session) {
-    const props = await getUserProps(session.userID)
+    const props = await getAccessesProps(session.userID)
     return {
       props: props!
     }

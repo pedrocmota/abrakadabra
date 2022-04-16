@@ -13,6 +13,12 @@ export const showAddUser = (closeCallback: () => void) => {
     html: <AddUser />,
     showDenyButton: false,
     showConfirmButton: false,
+    showClass: {
+      popup: 'animate__animated animate__zoomIn'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__zoomOut'
+    },
     didClose: () => closeCallback()
   })
 }

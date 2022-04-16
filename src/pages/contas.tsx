@@ -4,30 +4,15 @@ import {GetServerSideProps} from 'next'
 import Head from 'next/head'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
-import {
-  Flex,
-  Container,
-  Input,
-  Button,
-  Table,
-  Th,
-  Text,
-  Thead
-} from '@chakra-ui/react'
+import {Flex, Container, Input, Button, Text, Table, Thead, Th} from '@chakra-ui/react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import {useToasts} from 'react-toast-notifications'
 import {filter} from '../utils/filter'
 import {showAddUser} from '../popups/showAddUser'
 import {requireSession} from '../utils/request'
-import {getUserProps} from '../models/getUserProps'
-import {IProfileData, IUsers} from '../models/Schemas'
-
-interface IAccountsProps extends IProfileData {
-  userID: string,
-  isAdmin: boolean,
-  users: IUsers[]
-}
+import {getAccountsProps, IAccountsProps} from '../models/GetAccountsProps'
+import {IUsers} from '../models/Schemas'
 
 const Accounts: NextPage<IAccountsProps> = (props) => {
   const [data, setData] = useState<IUsers[]>(props.users)
@@ -44,7 +29,13 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
       title: 'Você confirma a ação?',
       showDenyButton: true,
       confirmButtonText: 'Sim',
-      denyButtonText: 'Não'
+      denyButtonText: 'Não',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut'
+      }
     }).then(async (result) => {
       if (result.isConfirmed) {
         const response = await axios.delete('/api/deleteUser', {
@@ -255,7 +246,7 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = requireSession(context.req.cookies.session, true)
   if (session) {
-    const props = await getUserProps(session.userID)
+    const props = await getAccountsProps(session.userID)
     return {
       props: {
         userID: session.userID,

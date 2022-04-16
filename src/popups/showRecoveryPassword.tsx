@@ -13,7 +13,13 @@ export const showRecoveryPassword = () => {
     html: <RecoveryPassword />,
     width: '450px',
     showDenyButton: false,
-    showConfirmButton: false
+    showConfirmButton: false,
+    showClass: {
+      popup: 'animate__animated animate__zoomIn'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__zoomOut'
+    }
   })
 }
 

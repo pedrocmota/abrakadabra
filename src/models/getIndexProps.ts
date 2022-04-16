@@ -1,7 +1,12 @@
-import {ObjectId} from 'mongodb'
-import {UsersSchema, CardsSchema, AccessesSchema, MachinesSchema} from './Schemas'
+import {UsersSchema, CardsSchema, AccessesSchema, MachinesSchema, IProfileData, ICards, IAccess} from './Schemas'
+import {toID} from '../utils/database'
 
-export const getIndexProps = async (userID: string) => {
+export interface IIndex extends IProfileData {
+  cards: ICards[],
+  accesses: IAccess[]
+}
+
+export const getIndexProps = async (userID: string): Promise<IIndex | undefined> => {
   const usersSchema = await UsersSchema()
   const cardsSchema = await CardsSchema()
   const accessesSchema = await AccessesSchema()
@@ -10,11 +15,11 @@ export const getIndexProps = async (userID: string) => {
   const allUsers = await usersSchema.find().toArray()
   const allMachines = await machinesSchema.find().toArray()
   const user = await usersSchema.findOne({
-    _id: new ObjectId(userID) as any
+    _id: toID(userID)
   })
   if (user) {
     const cards = (await cardsSchema.find({
-      user: user._id.toString() || ''
+      user: user._id.toString()
     }).toArray()).map(doc => {
       return ({
         ...doc,
@@ -23,7 +28,7 @@ export const getIndexProps = async (userID: string) => {
       })
     })
     const accesses = (await accessesSchema.find({
-      user: user._id.toString() || ''
+      user: user._id.toString()
     }, {
       sort: {datetime: 1},
       limit: 50
