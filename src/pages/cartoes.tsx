@@ -150,32 +150,50 @@ const Cards: NextPage<ICardsProps> = (props) => {
             >
               Cartões registrados
             </Text>
-            <Button
-              width="240px"
-              height="34px"
-              marginBottom="15px"
-              backgroundColor="#009879"
-              border="0"
-              borderRadius="2px"
-              color="#ffffff"
-              padding="10px"
-              disabled={cardsAmount === props.cardsLimit}
-              onClick={() => showAddCard(props, () => refresh())}
+            <Flex
+              display="flex"
               sx={{
-                '@media screen and (max-width: 614px)': {
-                  width: '100%',
-                  height: '40px'
+                '@media screen and (max-width: 664px)': {
+                  flexDirection: 'column'
                 }
               }}
-              _hover={{
-                backgroundColor: '#03A786'
-              }}
             >
-              Cadastrar novo cartão
-            </Button>
-            <Text paddingLeft="1px">
-              {cardsAmount} de {props.cardsLimit} cartões registrados
-            </Text>
+              <Button
+                width="240px"
+                height="34px"
+                marginBottom="15px"
+                backgroundColor="#009879"
+                border="0"
+                borderRadius="2px"
+                color="#ffffff"
+                padding="10px"
+                disabled={cardsAmount === props.cardsLimit}
+                onClick={() => showAddCard(props, () => refresh())}
+                sx={{
+                  '@media screen and (max-width: 614px)': {
+                    width: '100%',
+                    height: '40px'
+                  }
+                }}
+                _hover={{
+                  backgroundColor: '#03A786'
+                }}
+              >
+                Cadastrar novo cartão
+              </Button>
+              <Text
+                display="flex"
+                alignItems="center"
+                paddingLeft="10px"
+                sx={{
+                  '@media screen and (max-width: 664px)': {
+                    paddingLeft: '0px'
+                  }
+                }}
+              >
+                {cardsAmount} de {props.cardsLimit} cartões registrados
+              </Text>
+            </Flex>
             <Flex
               display="flex"
               __css={{

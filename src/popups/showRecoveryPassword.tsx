@@ -46,7 +46,13 @@ const RecoveryPassword: React.FunctionComponent = () => {
             Esse link será válido por apenas 5 minutos.
           </div>
         </div>
-        `
+        `,
+        showClass: {
+          popup: 'animate__animated animate__zoomIn'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__zoomOut'
+        }
       })
     }).catch((error) => {
       setLoading(false)

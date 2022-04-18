@@ -27,7 +27,13 @@ const Index: NextPage<IIndex> = (props) => {
       title: 'Você confirma a ação?',
       showDenyButton: true,
       confirmButtonText: 'Sim',
-      denyButtonText: 'Não'
+      denyButtonText: 'Não',
+      showClass: {
+        popup: 'animate__animated animate__zoomIn'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__zoomOut'
+      }
     }).then(async (result) => {
       if (result.isConfirmed) {
         const response = await axios.post('/api/changeCardStatus', {
