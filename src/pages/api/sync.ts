@@ -28,10 +28,10 @@ export default async (req: ExtendedNextApiRequest<ISyncRequest>, res: NextApiRes
   }
   const cards = (await cardsSchema.find().project({_id: 0, uuid: 1, status: 1}).toArray())
   const cardsArray = cards.filter((card) => card !== null && card.status === 1).map((e) => e.uuid) as string[]
-  const hash = crypto.createHash('shake256', {outputLength: 8}).update(cardsArray.toString()).digest('hex')
+  const hash = crypto.createHash('shake256', {outputLength: 6}).update(cardsArray.toString()).digest('hex')
   res.json({
-    inReadingMode: cards.some((card) => card.status === 3),
-    cards: cardsArray,
-    hash: hash
+    inWritingMode: cards.some((card) => card.status === 3),
+    hash: hash,
+    cards: cardsArray
   })
 }

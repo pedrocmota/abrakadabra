@@ -19,7 +19,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
   const router = useRouter()
   const [user, setUser] = useState((router.query.user as string) || '')
   const [data, setData] = useState<ICards[]>([])
-  const [inReadingMode, setInReadingMode] = useState(false)
+  const [inWritingMode, setInWritingMode] = useState(false)
   const [cardsAmount, setCardsAmount] = useState(props.cardsAmount)
   const [loading, setLoading] = useState(false)
   const {addToast} = useToasts()
@@ -40,7 +40,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
       })
       setLoading(false)
       setData(response.data.cards)
-      setInReadingMode(response.data.inReadingMode)
+      setInWritingMode(response.data.inWritingMode)
       setCardsAmount(response.data.cardsAmount)
     }
   }
@@ -101,7 +101,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
             return newCard
           }))
           addToast('Estado alterado com sucesso!', {appearance: 'success'})
-          setInReadingMode(cards.some((card) => card.status === 3))
+          setInWritingMode(cards.some((card) => card.status === 3))
         } else {
           addToast(`Erro desconhecido. Status code ${response.status}`, {appearance: 'error'})
         }
@@ -325,7 +325,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
                           <Flex
                             flexDir="column"
                           >
-                            {(card.status === 0 && !inReadingMode) && (
+                            {(card.status === 0 && !inWritingMode) && (
                               <Button
                                 width="100%"
                                 height="30px"
@@ -385,7 +385,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
                                 Ativar cartão
                               </Button>
                             )}
-                            {(card.status === 3 && inReadingMode) && (
+                            {(card.status === 3 && inWritingMode) && (
                               <Button
                                 width="100%"
                                 height="30px"

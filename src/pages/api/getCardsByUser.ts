@@ -35,7 +35,7 @@ export default async (req: ExtendedNextApiRequest<IGetCardsByUserRequest>, res: 
   })
   const cardsAmount = await cardsSchema.countDocuments()
   return res.json({
-    inReadingMode: cards.some((card) => card.status === 3),
+    inWritingMode: cards.some((card) => card.status === 3),
     cards: cards.filter((card) => card.user == req.query.userID),
     cardsAmount: cardsAmount
   })
