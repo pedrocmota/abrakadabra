@@ -58,7 +58,11 @@ const AddUser: React.FunctionComponent = () => {
       Swal.close()
     }).catch((error) => {
       setLoading(false)
-      return addToast(`Erro desconhecido. Status ${error.response.status}`, {appearance: 'error'})
+      if (error.response.status === 409) {
+        return addToast('Esse e-email já está sendo utilizado', {appearance: 'error'})
+      } else {
+        return addToast(`Erro desconhecido. Status ${error.response.status}`, {appearance: 'error'})
+      }
     })
   }
 
