@@ -23,7 +23,7 @@ const Accesses: NextPage<IAccessesProps> = (props) => {
 
   const {addToast} = useToasts()
   const table = createRef<HTMLTableElement>()
-  const accesses = data.filter(e => e.user === user)
+  const accesses = user === 'all' ? data : data.filter(e => e.user === user)
 
   useEffect(() => {
     setLoading(true);
@@ -299,6 +299,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = requireSession(context.req.cookies.session, true)
   if (session) {
     const props = await getAccessesProps(session.userID)
+    props?.users.unshift({_id: 'all', name: 'Todos os usuários'})
     return {
       props: props!
     }

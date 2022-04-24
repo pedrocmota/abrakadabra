@@ -7,40 +7,39 @@ interface IGetAccessesByUserRequest {
 }
 
 export default async (req: ExtendedNextApiRequest<IGetAccessesByUserRequest>, res: NextApiResponse) => {
-  if (req.method === 'GET') {
-    if (requireParams(req, {
-      query: {
-        userID: 'string'
-      }
-    })) {
-      const session = requireSession(req.cookies.session, true)
-      if (session) {
-        const usersSchema = await UsersSchema()
-        const accessesSchema = await AccessesSchema()
-        const machinesSchema = await MachinesSchema()
-
-        const allUsers = await usersSchema.find().toArray()
-        const allMachines = await machinesSchema.find().toArray()
-        const accesses = (await accessesSchema.find({
-          user: req.query.userID
-        }, {
-          sort: {datetime: 1}
-        }).toArray()).map(doc => {
-          return ({
-            ...doc,
-            _id: doc._id.toString(),
-            place: allMachines.find(e => e._id.toString() === doc.place)?.alias || 'Desconhecido',
-            userName: allUsers.find(e => e._id.toString() === doc.user)?.name || 'Desconhecido'
-          })
-        })
-        return res.json(accesses)
-      } else {
-        return res.status(401).end()
-      }
-    } else {
-      return res.status(422).end()
-    }
-  } else {
+  if (req.method !== 'GET') {
     return res.status(405).end()
   }
+  if (!requireParams(req, {
+    query: {
+      userID: 'string'
+    }
+  })) {
+    return res.status(422).end()
+  }
+  const session = requireSession(req.cookies.session, true)
+  if (!session) {
+    return res.status(401).end()
+  }
+  const usersSchema = await UsersSchema()
+  const accessesSchema = await AccessesSchema()
+  const machinesSchema = await MachinesSchema()
+
+  const allUsers = await usersSchema.find().toArray()
+  const allMachines = await machinesSchema.find().toArray()
+  const accesses = (await accessesSchema.find({
+    ...((req.query.userID) !== 'all' && {
+      user: req.query.userID
+    })
+  }, {
+    sort: {datetime: 1}
+  }).toArray()).map(doc => {
+    return ({
+      ...doc,
+      _id: doc._id.toString(),
+      place: allMachines.find(e => e._id.toString() === doc.place)?.alias || 'Desconhecido',
+      userName: allUsers.find(e => e._id.toString() === doc.user)?.name || 'Desconhecido'
+    })
+  })
+  return res.json(accesses)
 }

@@ -24,7 +24,7 @@ export default async (req: ExtendedNextApiRequest<IGetCardsByUserRequest>, res: 
   const usersSchema = await UsersSchema()
   const cardsSchema = await CardsSchema()
   const allUsers = await usersSchema.find().toArray()
-  const cards = (await cardsSchema.find({}, {
+  const allCards = (await cardsSchema.find({}, {
     sort: {datetime: 1}
   }).toArray()).map(doc => {
     return ({
@@ -35,8 +35,8 @@ export default async (req: ExtendedNextApiRequest<IGetCardsByUserRequest>, res: 
   })
   const cardsAmount = await cardsSchema.countDocuments()
   return res.json({
-    inWritingMode: cards.some((card) => card.status === 3),
-    cards: cards.filter((card) => card.user == req.query.userID),
+    inWritingMode: allCards.some((card) => card.status === 3),
+    cards: req.query.userID === 'all' ? allCards : allCards.filter((card) => card.user == req.query.userID),
     cardsAmount: cardsAmount
   })
 }
