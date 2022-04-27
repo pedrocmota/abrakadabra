@@ -9,7 +9,7 @@ export const showAddCard = (props: IAddCard, closeCallback: () => void) => {
   const MySwal = withReactContent(Swal)
   return MySwal.fire({
     title: 'Adicionar cartão',
-    html: <AddCard users={props.users.splice(1)} />,
+    html: <AddCard users={props.users} />,
     showDenyButton: false,
     showConfirmButton: false,
     showClass: {
@@ -33,6 +33,7 @@ const AddCard: React.FunctionComponent<IAddCard> = (props) => {
   const [alias, setAlias] = useState('')
   const [user, setUser] = useState('')
   const [loading, setLoading] = useState(false)
+  const users = [...props.users.slice(0, 0), ...props.users.slice(0 + 1)]
   const validButton = alias.length > 3 && alias.length < 30 && user.length > 0 && !loading
   const {addToast} = toasts
 
@@ -85,7 +86,7 @@ const AddCard: React.FunctionComponent<IAddCard> = (props) => {
         marginTop="10px"
         onChange={(e) => setUser(e.currentTarget.value)}
       >
-        {(props.users.map(user => {
+        {(users.map(user => {
           return (
             <option key={user._id} value={user._id}>{user.name}</option>
           )

@@ -81,7 +81,7 @@ const Accounts: NextPage<IAccountsProps> = (props) => {
             display="flex"
             flexDir="column"
             width="95%"
-            maxW="1200px"
+            maxW="1000px"
             flex="1"
             marginTop="40px"
             marginBottom="40px"
