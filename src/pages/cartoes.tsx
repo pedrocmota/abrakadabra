@@ -137,7 +137,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
             display="flex"
             flexDir="column"
             width="95%"
-            maxW="1000px"
+            maxW="1200px"
             flex="1"
             marginTop="40px"
             marginBottom="40px"
@@ -303,6 +303,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
                   <tr id="thdead">
                     <Th>Código do cartão</Th>
                     <Th>Nome do cartão</Th>
+                    <Th>Usuário</Th>
                     <Th>UUID</Th>
                     <Th>Estado</Th>
                     <Th width="250px">Ação</Th>
@@ -314,6 +315,7 @@ const Cards: NextPage<ICardsProps> = (props) => {
                       <tr key={card._id}>
                         <td>{card.code}</td>
                         <td>{card.alias}</td>
+                        <td>{card.userName}</td>
                         <td>{card.uuid}</td>
                         <td>
                           {card.status === 0 && 'Sem UUID'}

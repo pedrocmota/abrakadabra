@@ -9,7 +9,7 @@ export const showAddCard = (props: IAddCard, closeCallback: () => void) => {
   const MySwal = withReactContent(Swal)
   return MySwal.fire({
     title: 'Adicionar cartão',
-    html: <AddCard users={props.users} />,
+    html: <AddCard users={props.users.splice(1)} />,
     showDenyButton: false,
     showConfirmButton: false,
     showClass: {

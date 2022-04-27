@@ -20,7 +20,8 @@ export interface ICards {
   alias: string,
   uuid?: string,
   status: number,
-  user: string
+  user: string,
+  userName?: string
 }
 
 export interface IAccess {
